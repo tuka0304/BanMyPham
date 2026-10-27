@@ -1,0 +1,621 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aeterna Elixir • Haute Parfumerie</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="{% static 'js/gpu-accelerator.js' %}"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #000000;
+            color: #f9fafb;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* 3D Scene Viewport */
+        #scene-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at 50% 45%, rgba(217, 119, 6, 0.12) 0%, rgba(10, 8, 6, 0.6) 40%, #000000 80%);
+            perspective: 1200px;
+            z-index: 2;
+        }
+
+        /* Ambient Lighting Aura behind bottle */
+        .ambient-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.05) 45%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(40px);
+            pointer-events: none;
+            animation: pulseGlow 6s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(0.9); opacity: 0.7; }
+            100% { transform: scale(1.15); opacity: 1; }
+        }
+
+        /* Bottle Stage */
+        #bottle-wrapper {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform-style: preserve-3d;
+            transition: transform 0.15s ease-out;
+            cursor: pointer;
+        }
+
+        #perfume-bottle {
+            max-height: 75vh;
+            max-width: 90vw;
+            object-fit: contain;
+            display: block;
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 20px rgba(245, 158, 11, 0.15));
+            transition: filter 0.4s ease;
+            transform-origin: center bottom;
+        }
+
+        #bottle-wrapper:hover #perfume-bottle {
+            filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 35px rgba(245, 158, 11, 0.35));
+        }
+
+        /* Particle Canvas overlay */
+        #particle-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 4;
+        }
+
+        /* Luxury Header */
+        .brand-header {
+            position: absolute;
+            top: 35px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .brand-tag {
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.35em;
+            color: #d97706;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            text-shadow: 0 0 12px rgba(217, 119, 6, 0.5);
+        }
+
+        .brand-title {
+            font-family: 'Cinzel', serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 0.25em;
+            color: #fef3c7;
+            text-transform: uppercase;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Instruction Cue */
+        #instruction-btn {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 28px;
+            background: rgba(18, 15, 12, 0.7);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 9999px;
+            color: #fde68a;
+            font-family: 'Cinzel', serif;
+            font-size: 12px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(245, 158, 11, 0.2);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeInGuide 1.5s 1.2s forwards;
+        }
+
+        #instruction-btn:hover {
+            border-color: rgba(245, 158, 11, 0.8);
+            background: rgba(30, 22, 16, 0.85);
+            box-shadow: 0 10px 40px rgba(245, 158, 11, 0.35), 0 0 25px rgba(245, 158, 11, 0.4);
+            transform: translateX(-50%) translateY(-2px);
+            color: #ffffff;
+        }
+
+        #instruction-btn i {
+            color: #f59e0b;
+            font-size: 13px;
+            animation: pulseIcon 2s infinite;
+        }
+
+        @keyframes pulseIcon {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.3); opacity: 1; color: #fbbf24; }
+        }
+
+        @keyframes fadeInGuide {
+            to { opacity: 1; }
+        }
+
+        /* Skip directly to boutique */
+        .skip-link {
+            position: absolute;
+            top: 35px;
+            right: 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(254, 243, 199, 0.6);
+            text-decoration: none;
+            letter-spacing: 0.08em;
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            z-index: 12;
+        }
+
+        .skip-link:hover {
+            color: #ffffff;
+            border-color: rgba(245, 158, 11, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Luxury Transition Overlays */
+        #bloom-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 30%, rgba(245, 158, 11, 0.4) 0%, rgba(20, 15, 10, 0.95) 70%, #030712 100%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+        }
+
+        #dark-veil {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #030712;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.8s ease-out;
+            z-index: 25;
+        }
+    </style>
+
+    <!-- Three.js & GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+</head>
+<body>
+    <div class="ambient-glow"></div>
+
+    <header class="brand-header">
+        <div class="brand-tag">Haute Parfumerie</div>
+        <h1 class="brand-title">Aeterna Elixir</h1>
+    </header>
+
+    <a href="{% url 'index' %}" class="skip-link">Vào Cửa Hàng &rarr;</a>
+
+    <div id="scene-container">
+        <div id="bottle-wrapper">
+            <img id="perfume-bottle" src="{% static 'images/aeterna_elixir_landing.jpg' %}" alt="Aeterna Elixir Eau De Parfum">
+        </div>
+    </div>
+
+    <!-- Volumetric Three.js Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Interaction Trigger -->
+    <div id="instruction-btn">
+        <i class="fa fa-sparkles"></i>
+        <span>Chạm Để Trải Nghiệm Hương Sắc</span>
+    </div>
+
+    <div id="bloom-overlay"></div>
+    <div id="dark-veil"></div>
+
+    <script>
+        // --- 1. Three.js Scene Setup (GPU Hardware Accelerated) ---
+        const canvas = document.getElementById('particle-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.set(0, 0, 12);
+
+        const renderer = new THREE.WebGLRenderer({ 
+            canvas: canvas, 
+            antialias: true, 
+            alpha: true,
+            powerPreference: 'high-performance',
+            precision: 'mediump'
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+
+        // Soft Radial Particle Texture
+        function createSoftMistTexture() {
+            const ctxCanvas = document.createElement('canvas');
+            ctxCanvas.width = 128;
+            ctxCanvas.height = 128;
+            const ctx = ctxCanvas.getContext('2d');
+            const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+            grad.addColorStop(0.25, 'rgba(253, 230, 138, 0.45)');
+            grad.addColorStop(0.55, 'rgba(217, 119, 6, 0.15)');
+            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 128, 128);
+
+            const texture = new THREE.Texture(ctxCanvas);
+            texture.needsUpdate = true;
+            return texture;
+        }
+
+        const mistTexture = createSoftMistTexture();
+
+        // Ambient Floating Golden Dust Motes - Chuyển sang GPU Shader (Zero CPU Load)
+        const dustCount = 200;
+        const dustGeo = new THREE.BufferGeometry();
+        const dustPositions = new Float32Array(dustCount * 3);
+        const dustSpeedsArray = new Float32Array(dustCount * 3);
+        const dustPhases = new Float32Array(dustCount);
+
+        for (let i = 0; i < dustCount; i++) {
+            dustPositions[i * 3] = (Math.random() - 0.5) * 20;
+            dustPositions[i * 3 + 1] = (Math.random() - 0.5) * 14;
+            dustPositions[i * 3 + 2] = (Math.random() - 0.5) * 10;
+            dustSpeedsArray[i * 3] = (Math.random() - 0.5) * 0.002;
+            dustSpeedsArray[i * 3 + 1] = Math.random() * 0.004 + 0.001;
+            dustSpeedsArray[i * 3 + 2] = 0;
+            dustPhases[i] = Math.random() * Math.PI * 2;
+        }
+        dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
+        dustGeo.setAttribute('aSpeed', new THREE.BufferAttribute(dustSpeedsArray, 3));
+        dustGeo.setAttribute('aPhase', new THREE.BufferAttribute(dustPhases, 1));
+
+        const dustVertexShader = `
+            uniform float uTime;
+            attribute vec3 aSpeed;
+            attribute float aPhase;
+
+            void main() {
+                vec3 pos = position;
+                // GPU tính toán bay lơ lửng tuần hoàn không tốn CPU
+                float movedY = pos.y + aSpeed.y * uTime * 45.0;
+                pos.y = mod(movedY + 7.0, 14.0) - 7.0;
+                pos.x += sin(uTime * 1.0 + aPhase) * 0.25;
+
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = (26.0) / -mvPosition.z;
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const dustFragmentShader = `
+            uniform sampler2D uTexture;
+            uniform vec3 uColor;
+            uniform float uOpacity;
+
+            void main() {
+                vec4 tex = texture2D(uTexture, gl_PointCoord);
+                gl_FragColor = vec4(uColor, tex.a * uOpacity);
+            }
+        `;
+
+        const dustMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uTexture: { value: mistTexture },
+                uColor: { value: new THREE.Color(0xf59e0b) },
+                uOpacity: { value: 0.65 }
+            },
+            vertexShader: dustVertexShader,
+            fragmentShader: dustFragmentShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const dustMesh = new THREE.Points(dustGeo, dustMaterial);
+        scene.add(dustMesh);
+
+        // --- 2. Accurate Screen to Three.js World Projection ---
+        function screenToWorld(screenX, screenY, targetZ = 0) {
+            const vec = new THREE.Vector3();
+            vec.set((screenX / window.innerWidth) * 2 - 1, -(screenY / window.innerHeight) * 2 + 1, 0.5);
+            vec.unproject(camera);
+            vec.sub(camera.position).normalize();
+            const distance = (targetZ - camera.position.z) / vec.z;
+            return camera.position.clone().add(vec.multiplyScalar(distance));
+        }
+
+        // --- 3. Fluid Volumetric Perfume Mist System ---
+        let mistSystem = null;
+        let mistVelocities = [];
+        let mistFrames = 0;
+        let isSpraying = false;
+
+        function createPerfumeMist(originX, originY, originZ) {
+            const particleCount = 2200;
+            const geo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            mistVelocities = [];
+            mistFrames = 0;
+
+            const colorAmber = new THREE.Color(0xf59e0b); // Gold Amber
+            const colorVapor = new THREE.Color(0xffffff); // Pearl White
+            const colorDarkGold = new THREE.Color(0xd97706);
+            const tempColor = new THREE.Color();
+
+            for (let i = 0; i < particleCount; i++) {
+                // Initialize out of view until spawn time
+                positions[i * 3] = 999;
+                positions[i * 3 + 1] = 999;
+                positions[i * 3 + 2] = 999;
+
+                // Color gradient
+                const mix = Math.random();
+                if (mix < 0.6) {
+                    tempColor.lerpColors(colorVapor, colorAmber, Math.random());
+                } else {
+                    tempColor.lerpColors(colorAmber, colorDarkGold, Math.random());
+                }
+                colors[i * 3] = tempColor.r;
+                colors[i * 3 + 1] = tempColor.g;
+                colors[i * 3 + 2] = tempColor.b;
+
+                // Cone spray trajectory: shooting forward and expanding outward (cone shape)
+                const angle = (Math.random() - 0.5) * Math.PI * 0.45; // Spread angle
+                const elevation = (Math.random() - 0.5) * Math.PI * 0.35;
+                const speed = Math.random() * 0.08 + 0.04;
+
+                mistVelocities.push({
+                    vx: Math.cos(elevation) * Math.sin(angle) * speed + (Math.random() * 0.03 + 0.02), // Gentle right-forward drift
+                    vy: Math.sin(elevation) * speed + (Math.random() * 0.02 + 0.01), // Gentle loft upward
+                    vz: Math.cos(elevation) * Math.cos(angle) * speed + 0.02, // Toward camera
+                    curlX: (Math.random() - 0.5) * 0.02,
+                    curlY: (Math.random() - 0.5) * 0.02,
+                    curlZ: (Math.random() - 0.5) * 0.02,
+                    spawnFrame: Math.floor(Math.random() * 50), // Staggered spawn for continuous spray cone
+                    active: false
+                });
+            }
+
+            geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const mat = new THREE.PointsMaterial({
+                size: 2.2,
+                map: mistTexture,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.85,
+                blending: THREE.NormalBlending,
+                depthWrite: false
+            });
+
+            mistSystem = new THREE.Points(geo, mat);
+            mistSystem.userData.origin = { x: originX, y: originY, z: originZ };
+            scene.add(mistSystem);
+            isSpraying = true;
+        }
+
+        // --- 4. Interactive 3D Parallax on Bottle ---
+        const bottleWrapper = document.getElementById('bottle-wrapper');
+        const bottleImg = document.getElementById('perfume-bottle');
+        let mouseX = 0;
+        let mouseY = 0;
+
+        window.addEventListener('mousemove', (e) => {
+            if (hasTriggered) return;
+            mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            // Subtle luxury 3D tilt
+            const tiltX = mouseY * 8; // degrees
+            const tiltY = mouseX * 10;
+            bottleWrapper.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale(1)`;
+
+            // Subtle dust follow
+            camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.03;
+            camera.position.y += (mouseY * 0.5 - camera.position.y) * 0.03;
+        });
+
+        // --- 5. Main Animation Loop (GPU Hardware Accelerated) ---
+        const clock = new THREE.Clock();
+        let isTabActive = true;
+
+        function animate() {
+            if (!isTabActive) return;
+            requestAnimationFrame(animate);
+
+            // CPU chỉ gửi biến thời gian uTime cho GPU Shader xử lý toàn bộ bụi vàng
+            dustMaterial.uniforms.uTime.value = clock.getElapsedTime();
+
+            // Animate perfume mist spray (Khi người dùng kích hoạt xịt nước hoa)
+            if (mistSystem && isSpraying) {
+                mistFrames++;
+                const positions = mistSystem.geometry.attributes.position.array;
+                const origin = mistSystem.userData.origin;
+
+                for (let i = 0; i < mistVelocities.length; i++) {
+                    const v = mistVelocities[i];
+                    if (!v.active) {
+                        if (mistFrames >= v.spawnFrame) {
+                            v.active = true;
+                            // Spawn at exact atomizer nozzle coordinate
+                            positions[i * 3] = origin.x;
+                            positions[i * 3 + 1] = origin.y;
+                            positions[i * 3 + 2] = origin.z;
+                        } else {
+                            continue;
+                        }
+                    }
+
+                    // Forward conical progression
+                    positions[i * 3] += v.vx;
+                    positions[i * 3 + 1] += v.vy;
+                    positions[i * 3 + 2] += v.vz;
+
+                    // Sinusoidal air curl turbulence
+                    positions[i * 3] += Math.sin(mistFrames * 0.05 + i) * 0.008;
+                    positions[i * 3 + 1] += Math.cos(mistFrames * 0.05 + i) * 0.008;
+
+                    // Expand plume outwards
+                    v.vx *= 1.015;
+                    v.vy *= 1.01;
+                }
+                mistSystem.geometry.attributes.position.needsUpdate = true;
+            }
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Tiết kiệm 100% CPU/GPU khi người dùng chuyển sang tab khác
+        window.addEventListener('gpu-tab-visibility', (e) => {
+            isTabActive = e.detail.active;
+            if (isTabActive) {
+                clock.start();
+                requestAnimationFrame(animate);
+            } else {
+                clock.stop();
+            }
+        });
+
+        // --- 6. Click Trigger Experience ---
+        let hasTriggered = false;
+
+        function triggerExperience() {
+            if (hasTriggered) return;
+            hasTriggered = true;
+
+            // Fade instruction button
+            gsap.to('#instruction-btn', { opacity: 0, y: 15, duration: 0.5 });
+            gsap.to('.brand-header', { opacity: 0, y: -15, duration: 0.8 });
+
+            // 1. Calculate Exact Atomizer Nozzle Coordinates on Screen
+            const rect = bottleImg.getBoundingClientRect();
+            // Measured exact pixel center of atomizer hole: X = 50.0%, Y = 19.27% of bottle image
+            const nozzleScreenX = rect.left + rect.width * 0.500;
+            const nozzleScreenY = rect.top + rect.height * 0.1927;
+
+            // Convert to Three.js world coordinate
+            const nozzleWorldPos = screenToWorld(nozzleScreenX, nozzleScreenY, 0);
+
+            // 2. Mechanical Atomizer Press Animation
+            gsap.timeline()
+                .to(bottleImg, {
+                    scaleY: 0.965,
+                    y: 6,
+                    duration: 0.12,
+                    ease: "power2.inOut"
+                })
+                .to(bottleImg, {
+                    scaleY: 1,
+                    y: 0,
+                    duration: 0.25,
+                    ease: "back.out(2)",
+                    onStart: () => {
+                        // 3. Erupt Mist exactly from nozzle hole
+                        createPerfumeMist(nozzleWorldPos.x, nozzleWorldPos.y, nozzleWorldPos.z);
+                    }
+                });
+
+            // 4. Cinematic Camera Zoom & Glide into the Fragrance Cloud
+            gsap.to(camera.position, {
+                z: 7.5,
+                x: 1.5,
+                y: 0.5,
+                duration: 2.4,
+                ease: "power2.inOut"
+            });
+
+            gsap.to(camera.rotation, {
+                y: 0.08,
+                duration: 2.4,
+                ease: "power2.inOut"
+            });
+
+            // 5. Golden Amber Fragrance Bloom Overlay
+            setTimeout(() => {
+                document.getElementById('bloom-overlay').style.opacity = '1';
+            }, 600);
+
+            setTimeout(() => {
+                document.getElementById('dark-veil').style.opacity = '1';
+            }, 1600);
+
+            // 6. Seamless Navigation into Store
+            setTimeout(() => {
+                sessionStorage.setItem('from_landing', 'true');
+                window.location.href = "{% url 'index' %}";
+            }, 2300);
+        }
+
+        // Attach Click to bottle and instruction button
+        document.getElementById('bottle-wrapper').addEventListener('click', triggerExperience);
+        document.getElementById('instruction-btn').addEventListener('click', triggerExperience);
+
+        // Window Resize Responsiveness
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

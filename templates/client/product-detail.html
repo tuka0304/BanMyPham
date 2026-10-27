@@ -1,0 +1,169 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}{{ product.meta_title|default:product.name }} - Aeterna{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-12 relative z-10">
+    <a href="{% url 'index' %}" class="text-cosmetic-500 hover:text-white transition inline-block mb-8 font-medium">
+        <i class="fa fa-arrow-left mr-2"></i> Quay lại cửa hàng
+    </a>
+    
+    <div class="glass-card rounded-2xl p-8 sm:p-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            
+            <div class="bg-gray-900 rounded-2xl overflow-hidden flex items-center justify-center h-[400px] border border-gray-800 relative group">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}?v=2" alt="{{ product.name }}" class="max-h-full w-auto object-contain transition duration-500 group-hover:scale-105">
+                {% else %}
+                <img src="{% static 'images/no-image.png' %}" alt="Không có ảnh" class="w-32 opacity-50">
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col">
+                <div class="flex items-center gap-3 mb-3">
+                    <span class="text-cosmetic-500 font-medium uppercase tracking-wider text-sm">{{ product.category.name }}</span>
+                    {% if product.brand %}
+                    <span class="text-gray-500 text-sm">|</span>
+                    <span class="text-gray-300 font-medium uppercase text-sm">{{ product.brand }}</span>
+                    {% endif %}
+                </div>
+                
+                <h1 class="text-4xl font-serif font-bold text-white mb-4 leading-tight">{{ product.name }}</h1>
+                <p class="text-3xl text-cosmetic-500 font-bold mb-6">{{ product.price|currency }}</p>
+                
+                <div class="bg-gray-800/40 border border-gray-700/50 rounded-xl p-4 mb-6 inline-flex flex-wrap items-center gap-6">
+                    <div>
+                        <i class="fa fa-box text-gray-400 mr-2"></i>
+                        <span class="text-gray-300">Kho: <strong class="text-white">{{ product.stock_quantity }}</strong></span>
+                    </div>
+                    {% if product.skin_type %}
+                    <div>
+                        <i class="fa fa-leaf text-gray-400 mr-2"></i>
+                        <span class="text-gray-300">Loại da: <strong class="text-white">{{ product.skin_type }}</strong></span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="prose prose-invert prose-p:text-gray-400 prose-p:leading-relaxed mb-8 max-w-none">
+                    <p class="font-medium text-gray-300">{{ product.description }}</p>
+                    {% if product.detailed_description %}
+                        <div class="mt-4 text-sm text-gray-400">{{ product.detailed_description|linebreaks }}</div>
+                    {% endif %}
+                </div>
+
+                <form action="{% url 'add_to_cart' %}" method="post" class="mt-auto mb-8">
+                    {% csrf_token %}
+                    <input type="hidden" name="productId" value="{{ product.id }}" />
+                    
+                    {% if request.user.is_authenticated %}
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="number" name="quantity" value="1" min="1" max="{{ product.stock_quantity }}" required 
+                                class="w-24 bg-gray-900 border border-gray-700 focus:border-cosmetic-500 text-white rounded-xl px-4 py-3 text-center focus:outline-none transition">
+                        </div>
+                        <button type="submit" class="flex-1 bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-3.5 rounded-xl font-bold transition shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] flex items-center justify-center">
+                            <i class="fa fa-shopping-cart mr-2"></i> Thêm vào giỏ hàng
+                        </button>
+                    </div>
+                    {% else %}
+                    <div class="bg-gray-800/50 border border-gray-700 rounded-xl p-6 text-center">
+                        <p class="text-gray-400 mb-4">Vui lòng đăng nhập để mua hàng.</p>
+                        <a href="{% url 'login' %}" class="inline-block bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-2.5 rounded-full font-medium transition">
+                            Đăng nhập
+                        </a>
+                    </div>
+                    {% endif %}
+                </form>
+                
+                {% if product.ingredients or product.usage_instructions %}
+                <div class="border-t border-gray-800 pt-6 mt-6">
+                    {% if product.usage_instructions %}
+                    <div class="mb-4">
+                        <h3 class="text-white font-bold mb-2"><i class="fa fa-magic text-cosmetic-500 mr-2"></i> Hướng dẫn sử dụng</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">{{ product.usage_instructions }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if product.ingredients %}
+                    <div class="mb-4">
+                        <h3 class="text-white font-bold mb-2"><i class="fa fa-flask text-cosmetic-500 mr-2"></i> Bảng thành phần (INCI)</h3>
+                        <p class="text-gray-500 text-xs leading-relaxed italic">{{ product.ingredients }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if product.allergy_warning %}
+                    <div class="bg-red-900/20 border border-red-500/30 rounded-xl p-4 mt-4">
+                        <h3 class="text-red-400 font-bold mb-1 text-sm"><i class="fa fa-exclamation-triangle mr-1"></i> Lưu ý kích ứng</h3>
+                        <p class="text-red-300/80 text-xs leading-relaxed">{{ product.allergy_warning }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Frequently Bought Together / MBA Recommendations -->
+    {% if recommendations %}
+    <div class="mt-12 glass-card rounded-2xl p-8 sm:p-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 border-b border-gray-800 pb-4">
+            <div>
+                <span class="text-cosmetic-500 font-semibold tracking-wider text-xs uppercase flex items-center gap-1.5 mb-1">
+                    <i class="fa fa-sparkles"></i> Phân tích Giỏ hàng & Thói quen mua sắm
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-white">Thường được mua cùng</h2>
+            </div>
+            <p class="text-gray-400 text-sm max-w-md">
+                Các sản phẩm được khách hàng chọn mua kèm nhiều nhất khi chọn sản phẩm này
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {% for item in recommendations %}
+            <div class="bg-gray-900/60 border border-gray-800 hover:border-cosmetic-500/50 rounded-2xl p-4 flex flex-col transition duration-300 group hover:-translate-y-1 hover:shadow-[0_10px_25px_rgba(236,72,153,0.15)]">
+                <!-- Product Image -->
+                <div class="bg-gray-950 rounded-xl overflow-hidden h-44 mb-4 flex items-center justify-center relative border border-gray-800/80">
+                    <a href="{% url 'product_detail' item.product.id %}" class="w-full h-full flex items-center justify-center p-3">
+                        <img src="{{ item.product.image_url|default:'/static/images/no-image.png' }}?v=2" alt="{{ item.product.name }}" class="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-105">
+                    </a>
+                    {% if item.tag %}
+                    <span class="absolute top-2 left-2 bg-cosmetic-600/90 backdrop-blur text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        {{ item.tag }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Product Info -->
+                <div class="flex-1 flex flex-col">
+                    <span class="text-xs text-cosmetic-400 font-medium uppercase mb-1">{{ item.product.category.name }}</span>
+                    <a href="{% url 'product_detail' item.product.id %}" class="text-white font-semibold text-sm line-clamp-2 hover:text-cosmetic-400 transition mb-2">
+                        {{ item.product.name }}
+                    </a>
+                    
+                    <p class="text-xs text-emerald-400 mb-3 flex items-center gap-1">
+                        <i class="fa fa-chart-line text-[11px]"></i> {{ item.reason }}
+                    </p>
+
+                    <div class="mt-auto pt-3 border-t border-gray-800 flex items-center justify-between gap-2">
+                        <span class="text-base font-bold text-cosmetic-500">
+                            {{ item.product.price|currency }}
+                        </span>
+                        
+                        <form action="{% url 'add_to_cart' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="productId" value="{{ item.product.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="bg-cosmetic-600/20 hover:bg-cosmetic-600 text-cosmetic-400 hover:text-white border border-cosmetic-500/30 hover:border-cosmetic-600 p-2.5 rounded-xl text-xs font-semibold transition flex items-center justify-center" title="Thêm ngay vào giỏ">
+                                <i class="fa fa-cart-plus text-sm"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

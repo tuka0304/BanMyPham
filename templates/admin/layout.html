@@ -1,0 +1,139 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmetics Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cosmetic: { 50: '#fdf2f8', 500: '#ec4899', 600: '#db2777', dark: '#111827', darker: '#030712' }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f9fafb; display: flex; overflow-x: hidden; }
+        
+        /* Glassmorphism Sidebar */
+        .sidebar { width: 260px; background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border-right: 1px solid rgba(255,255,255,0.05); height: 100vh; position: fixed; display: flex; flex-direction: column; z-index: 50; }
+        .sidebar-header { text-align: center; padding: 30px 20px; font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-header span { color: #ec4899; }
+        .nav-menu { list-style: none; padding: 20px 10px; margin: 0; flex-grow: 1; overflow-y: auto; }
+        .nav-item { margin-bottom: 8px; }
+        .nav-link { display: flex; align-items: center; color: #9ca3af; padding: 12px 20px; text-decoration: none; border-radius: 12px; transition: all 0.3s ease; font-size: 0.95rem; font-weight: 500; }
+        .nav-link i { width: 24px; font-size: 1.1rem; transition: transform 0.3s ease; }
+        .nav-link:hover { color: #fff; background: rgba(255,255,255,0.05); }
+        .nav-link:hover i { transform: translateX(4px); color: #ec4899; }
+        .nav-link.active { background: linear-gradient(135deg, #ec4899, #8b5cf6); color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+        .nav-link.active i { color: white; }
+
+        /* Main Content */
+        .main-content { margin-left: 260px; width: calc(100% - 260px); min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* Top bar */
+        .top-bar { background: rgba(3, 7, 18, 0.8); backdrop-filter: blur(10px); padding: 20px 40px; display: flex; justify-content: flex-end; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 40; }
+        .top-bar span { color: #9ca3af; margin-right: 20px; font-size: 0.9rem; }
+        .top-bar strong { color: #fff; font-weight: 600; }
+        .top-bar a { color: #ec4899; text-decoration: none; margin-left: 20px; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; display: flex; align-items: center; gap: 6px; }
+        .top-bar a:hover { color: #fbcfe8; }
+
+        /* Content Area */
+        .content-wrapper { padding: 40px; flex-grow: 1; }
+
+        /* Legacy Component Overrides */
+        .card, .stat-card { background: rgba(31, 41, 55, 0.4); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .card h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-top: 0; margin-bottom: 25px; color: #fff; display: flex; align-items: center; gap: 12px; }
+        .card h2 i { color: #ec4899; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; }
+        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); color: #d1d5db; }
+        th { background: rgba(0,0,0,0.2); color: #9ca3af; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 500; text-align: center; cursor: pointer; padding: 10px 20px; font-size: 0.9rem; border-radius: 10px; text-decoration: none; transition: all 0.3s ease; border: none; }
+        .btn-primary { background: #ec4899; color: white; box-shadow: 0 4px 15px rgba(236,72,153,0.2); }
+        .btn-primary:hover { background: #db2777; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(236,72,153,0.4); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+        .btn-success { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .btn-success:hover { background: rgba(16, 185, 129, 0.2); }
+        .btn-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .btn-warning:hover { background: rgba(245, 158, 11, 0.2); }
+
+        /* Forms */
+        .form-control, input, select, textarea { width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 16px; border-radius: 10px; font-size: 0.95rem; transition: border 0.3s; box-sizing: border-box; margin-bottom: 15px; }
+        .form-control:focus, input:focus, select:focus, textarea:focus { outline: none; border-color: #ec4899; }
+        label { display: block; margin-bottom: 8px; color: #9ca3af; font-size: 0.9rem; font-weight: 500; }
+
+        /* Alerts */
+        .alert { padding: 16px 20px; margin-bottom: 25px; border-radius: 12px; font-weight: 500; display: flex; align-items: center; gap: 12px; }
+        .alert-success { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .alert-danger { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* Dashboard specific */
+        .dashboard-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .stat-card { margin-bottom: 0; padding: 25px; display: flex; align-items: center; gap: 20px; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-icon { width: 60px; height: 60px; border-radius: 16px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; color: white; }
+        .bg-pink { background: linear-gradient(135deg, #ec4899, #f43f5e); box-shadow: 0 4px 15px rgba(236,72,153,0.3); }
+        .bg-blue { background: linear-gradient(135deg, #3b82f6, #06b6d4); box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .bg-green { background: linear-gradient(135deg, #10b981, #34d399); box-shadow: 0 4px 15px rgba(16,185,129,0.3); }
+        .stat-info h3 { margin: 0 0 5px 0; font-size: 1.8rem; color: white; }
+        .stat-info p { margin: 0; color: #9ca3af; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            Aeterna<span>.</span>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="{% url 'admin_index' %}" class="nav-link {% if activePage == 'dashboard' %}active{% endif %}"><i class="fa fa-tachometer-alt"></i> Tổng quan</a></li>
+            <li class="nav-item"><a href="{% url 'admin_categories' %}" class="nav-link {% if activePage == 'categories' %}active{% endif %}"><i class="fa fa-list"></i> Danh mục</a></li>
+            <li class="nav-item"><a href="{% url 'admin_products' %}" class="nav-link {% if activePage == 'products' %}active{% endif %}"><i class="fa fa-box"></i> Sản phẩm</a></li>
+            <li class="nav-item"><a href="{% url 'admin_orders' %}" class="nav-link {% if activePage == 'orders' %}active{% endif %}"><i class="fa fa-shopping-cart"></i> Đơn hàng</a></li>
+            <li class="nav-item"><a href="{% url 'admin_mba' %}" class="nav-link {% if activePage == 'mba' %}active{% endif %}"><i class="fa fa-chart-pie"></i> Phân tích Giỏ hàng</a></li>
+            <li class="nav-item"><a href="{% url 'admin_users' %}" class="nav-link {% if activePage == 'users' %}active{% endif %}"><i class="fa fa-users"></i> Người dùng</a></li>
+            <li class="nav-item"><a href="{% url 'admin_inventory' %}" class="nav-link {% if activePage == 'inventory' %}active{% endif %}"><i class="fa fa-warehouse"></i> Quản lý Kho</a></li>
+            <li class="nav-item"><a href="{% url 'danh_sach_phieu_kho' %}" class="nav-link {% if activePage == 'inventory_transactions' %}active{% endif %}"><i class="fa fa-dolly"></i> Xuất / Nhập Kho</a></li>
+            <li class="nav-item"><a href="{% url 'quan_ly_chi_nhanh' %}" class="nav-link {% if activePage == 'branch_management' %}active{% endif %}"><i class="fa fa-store-alt"></i> Quản lý Chi Nhánh</a></li>
+            <li class="nav-item"><a href="{% url 'quan_ly_nha_cung_cap' %}" class="nav-link {% if activePage == 'supplier_management' %}active{% endif %}"><i class="fa fa-truck-loading"></i> Nhà Cung Cấp</a></li>
+            <li class="nav-item"><a href="{% url 'admin_price_requests' %}" class="nav-link {% if activePage == 'price_requests' %}active{% endif %}"><i class="fa fa-tags"></i> Yêu cầu giá</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-bar">
+            <span>Xin chào Quản trị viên, <strong>{{ request.user.username }}</strong></span>
+            <a href="{% url 'index' %}"><i class="fa fa-store"></i> Cửa hàng</a>
+            <a href="{% url 'logout' %}"><i class="fa fa-sign-out-alt"></i> Đăng xuất</a>
+        </div>
+
+        <div class="content-wrapper">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                        <i class="fa {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+{% extends khung_giao_dien %}
+{% load custom_filters %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 12px;">
+            <i class="fa fa-dolly" style="color: #ec4899;"></i> Lịch Sử Xuất / Nhập Kho
+        </h2>
+        <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 0.95rem;">Theo dõi tất cả giao dịch nhập kho từ nhà cung cấp và xuất kho theo chi nhánh.</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+        <a href="{% url 'tao_phieu_kho' %}" class="btn btn-primary" style="padding: 12px 24px; font-weight: 600; border-radius: 12px;">
+            <i class="fa fa-plus-circle"></i> Tạo Phiếu Mới
+        </a>
+    </div>
+</div>
+
+<div class="card" style="padding: 20px; margin-bottom: 25px;">
+    <form method="get" action="{% url 'danh_sach_phieu_kho' %}" style="display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-end; margin: 0;">
+        <div style="flex: 1; min-width: 200px;">
+            <label style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 6px; display: block;">Tìm kiếm</label>
+            <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Mã phiếu, nhân viên nhận, nhà cung cấp..." style="margin-bottom: 0;">
+        </div>
+        <div style="width: 180px;">
+            <label style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 6px; display: block;">Loại phiếu</label>
+            <select name="loai_phieu" style="margin-bottom: 0;">
+                <option value="">Tất cả loại phiếu</option>
+                <option value="NHAP" {% if loai_phieu_loc == 'NHAP' %}selected{% endif %}>Nhập kho</option>
+                <option value="XUAT" {% if loai_phieu_loc == 'XUAT' %}selected{% endif %}>Xuất kho</option>
+            </select>
+        </div>
+        <div style="width: 220px;">
+            <label style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 6px; display: block;">Chi nhánh</label>
+            <select name="chi_nhanh_id" style="margin-bottom: 0;">
+                <option value="">Tất cả chi nhánh</option>
+                {% for cn in danh_sach_chi_nhanh %}
+                <option value="{{ cn.id }}" {% if chi_nhanh_loc == cn.id|stringformat:"s" %}selected{% endif %}>{{ cn.ten_chi_nhanh }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" class="btn btn-primary" style="height: 46px; padding: 0 20px;">
+                <i class="fa fa-search"></i> Lọc
+            </button>
+            <a href="{% url 'danh_sach_phieu_kho' %}" class="btn btn-warning" style="height: 46px; padding: 0 16px; color: #fff;">
+                <i class="fa fa-undo"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th style="padding-left: 25px;">MÃ PHIẾU</th>
+                <th>LOẠI</th>
+                <th>CHI NHÁNH</th>
+                <th>ĐỐI TÁC / NCC</th>
+                <th>NHÂN VIÊN NHẬN</th>
+                <th>NGÀY TẠO</th>
+                <th style="text-align: right;">TỔNG GIÁ TRỊ</th>
+                <th style="text-align: center; padding-right: 25px;">THAO TÁC</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for phieu in danh_sach_phieu %}
+            <tr>
+                <td style="padding-left: 25px;">
+                    <div style="font-weight: 700; color: #f472b6; font-size: 1rem;">{{ phieu.ma_phieu }}</div>
+                    <small style="color: #6b7280;">Bởi: {{ phieu.nguoi_lap_phieu.username }}</small>
+                </td>
+                <td>
+                    {% if phieu.loai_phieu == 'NHAP' %}
+                    <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <i class="fa fa-arrow-down"></i> Nhập kho
+                    </span>
+                    {% else %}
+                    <span style="display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3);">
+                        <i class="fa fa-arrow-up"></i> Xuất kho
+                    </span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span style="font-weight: 600; color: #e5e7eb;">{{ phieu.chi_nhanh.ten_chi_nhanh }}</span>
+                </td>
+                <td>
+                    {% if phieu.nha_cung_cap %}
+                    <span style="color: #60a5fa; font-weight: 500;">
+                        <i class="fa fa-truck" style="font-size: 0.8rem; margin-right: 4px;"></i> {{ phieu.nha_cung_cap.ten_nha_cung_cap }}
+                    </span>
+                    {% else %}
+                    <span style="color: #9ca3af; font-style: italic;">Nội bộ / Khác</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <span style="display: inline-block; background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; color: #d1d5db;">
+                        <i class="fa fa-user-check" style="color: #ec4899; margin-right: 4px;"></i> {{ phieu.nhan_vien_nhan }}
+                    </span>
+                </td>
+                <td style="color: #9ca3af; font-size: 0.9rem;">
+                    {{ phieu.ngay_tao|date:"d/m/Y H:i" }}
+                </td>
+                <td style="text-align: right; font-weight: 700; color: #34d399; font-size: 1.05rem;">
+                    {{ phieu.tong_tien|currency }}
+                </td>
+                <td style="text-align: center; padding-right: 25px;">
+                    <a href="{% url 'chi_tiet_phieu_kho' phieu.id %}" class="btn" style="background: rgba(236,72,153,0.15); color: #f472b6; border: 1px solid rgba(236,72,153,0.3); padding: 6px 14px; font-size: 0.85rem;">
+                        <i class="fa fa-eye"></i> Chi tiết
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 40px; color: #9ca3af;">
+                    <i class="fa fa-box-open" style="font-size: 2.5rem; color: #4b5563; margin-bottom: 15px; display: block;"></i>
+                    Chưa có phiếu xuất nhập kho nào phù hợp.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

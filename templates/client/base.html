@@ -1,0 +1,513 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Aeterna - Mỹ Phẩm Cao Cấp{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cosmetic: {
+                            50: '#fdf2f8', 100: '#fce7f3', 500: '#ec4899', 600: '#db2777', 900: '#831843',
+                            dark: '#111827', darker: '#030712'
+                        }
+                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] }
+                }
+            }
+        }
+    </script>
+    <script src="{% static 'js/gpu-accelerator.js' %}"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+        
+        :root {
+            --bg-color: #fdfafb;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --nav-bg: rgba(255, 255, 255, 0.7);
+            --nav-border: rgba(0, 0, 0, 0.05);
+            --card-bg: rgba(255, 255, 255, 0.6);
+            --card-border: rgba(236, 72, 153, 0.15);
+            --footer-bg: #f9fafb;
+            --footer-border: #e5e7eb;
+            --link-hover: #111827;
+        }
+        
+        html.dark {
+            --bg-color: #030712;
+            --text-color: #f9fafb;
+            --text-muted: #9ca3af;
+            --nav-bg: rgba(17, 24, 39, 0.7);
+            --nav-border: rgba(255, 255, 255, 0.1);
+            --card-bg: rgba(31, 41, 55, 0.6);
+            --card-border: rgba(255, 255, 255, 0.05);
+            --footer-bg: #000000;
+            --footer-border: #1f2937;
+            --link-hover: #ffffff;
+        }
+
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow-x: hidden; transition: background-color 0.5s ease, color 0.5s ease; }
+        h1, h2, h3, .font-serif { font-family: 'Playfair Display', serif; }
+        p { color: var(--text-muted); transition: color 0.5s ease; }
+        
+        #canvas-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; transition: opacity 0.5s ease; }
+        
+        .glass-nav { background: var(--nav-bg); backdrop-filter: blur(12px); border-bottom: 1px solid var(--nav-border); transition: background 0.5s ease, border 0.5s ease; }
+        
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(12px); border: 1px solid var(--card-border); transition: all 0.3s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .glass-card:hover { transform: translate3d(0, -5px, 0); box-shadow: 0 20px 25px -5px rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.3); }
+        .glass-card h3, .glass-card h1 { color: var(--text-color); }
+        .glass-card p { color: var(--text-muted); }
+        
+        .text-gradient { background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-image: linear-gradient(to right, #db2777, #ec4899); }
+        html.dark .text-gradient { background-image: linear-gradient(to right, #fbcfe8, #ec4899); }
+
+        .main-container { position: relative; z-index: 10; min-height: calc(100vh - 80px); padding-top: 100px; }
+        
+        .nav-link { color: var(--text-muted); transition: color 0.3s ease; }
+        .nav-link:hover { color: var(--link-hover); }
+        
+        /* For Forms in Dark/Light Mode */
+        .form-input-themed { background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.2); color: var(--text-color); }
+        .form-input-themed option { background: #ffffff; color: #1f2937; }
+        html.dark .form-input-themed { background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); }
+        html.dark .form-input-themed option { background: #1f2937; color: #f9fafb; }
+        
+        /* Button Click Glow */
+        .btn-click-glow {
+            box-shadow: 0 0 25px 8px rgba(236,72,153,0.8), inset 0 0 10px rgba(236,72,153,0.5) !important;
+            border-color: #ec4899 !important;
+            transition: all 0.1s ease-out !important;
+            outline: none !important;
+        }
+        
+        /* Click Effect Styles - Tối ưu GPU Compositing */
+        .click-glow {
+            position: fixed;
+            pointer-events: none;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,105,180,0.8) 0%, rgba(255,105,180,0) 70%);
+            border-radius: 50%;
+            transform: translate3d(-50%, -50%, 0) scale(0);
+            animation: glow-burst 0.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            z-index: 999999;
+            mix-blend-mode: screen;
+            will-change: transform, opacity;
+            contain: layout style paint;
+        }
+        .click-flower {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999999;
+            transform: translate3d(-50%, -50%, 0);
+            animation: flower-fly 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+            text-shadow: 0 0 8px currentColor;
+            will-change: transform, opacity;
+            contain: layout style paint;
+        }
+
+        /* 3D Hardware Accelerated Keyframes */
+        @keyframes glow-burst {
+            0% { transform: translate3d(-50%, -50%, 0) scale(0.1); opacity: 1; }
+            100% { transform: translate3d(-50%, -50%, 0) scale(2.5); opacity: 0; }
+        }
+
+        @keyframes flower-fly {
+            0% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale(0.2) rotate(0deg); }
+            100% { opacity: 0; transform: translate3d(calc(-50% + var(--tx)), calc(-50% + var(--ty)), 0) scale(1.5) rotate(var(--rot)); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Seamless Transition Overlay -->
+    <div id="seamless-transition-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 30%, rgba(217, 119, 6, 0.25) 0%, rgba(10, 8, 6, 0.95) 60%, #030712 100%); backdrop-filter: blur(12px); z-index: 9999999; display: none; pointer-events: none; transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+    <script>
+        if (sessionStorage.getItem('from_landing') === 'true') {
+            const overlay = document.getElementById('seamless-transition-overlay');
+            overlay.style.display = 'block';
+            overlay.style.opacity = '1';
+            sessionStorage.removeItem('from_landing');
+            
+            // Đợi trình duyệt render xong giao diện rồi mới từ từ làm trong suốt lớp phủ
+            window.addEventListener('load', function() {
+                // Rút ngắn thời gian delay
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 1000); // Rút ngắn thời gian dọn dẹp
+                }, 100);
+            });
+        }
+    </script>
+
+    <!-- 3D Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass-nav transition-all duration-300 top-0 left-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="{% url 'index' %}" class="text-2xl font-serif font-bold tracking-wider uppercase" style="color: var(--text-color);">
+                        Aeterna<span class="text-cosmetic-500">.</span>
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="{% url 'index' %}" class="nav-link px-3 py-2 text-sm font-medium uppercase tracking-wide">Trang chủ</a>
+                    <a href="{% url 'index' %}#products" class="nav-link px-3 py-2 text-sm font-medium uppercase tracking-wide">Sản phẩm</a>
+                    <a href="{% url 'order_list' %}" class="nav-link px-3 py-2 text-sm font-medium uppercase tracking-wide">Đơn hàng</a>
+                </div>
+                <div class="flex items-center space-x-5">
+                    <!-- Theme Toggle -->
+                    <button id="theme-toggle" class="text-cosmetic-500 hover:text-cosmetic-600 transition-transform transform hover:scale-110" title="Chuyển đổi Sáng/Tối">
+                        <i class="fa fa-moon text-xl" id="theme-icon"></i>
+                    </button>
+                    
+                    <div class="h-6 w-px bg-gray-300 dark:bg-gray-700"></div>
+
+                    {% if not request.user.is_authenticated %}
+                        <a href="{% url 'login' %}" class="nav-link text-sm font-medium">Đăng nhập</a>
+                        <a href="{% url 'register' %}" class="bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-5 py-2 rounded-full transition text-sm font-medium shadow-lg shadow-cosmetic-500/30">Đăng ký</a>
+                    {% else %}
+                        <a href="{% url 'view_cart' %}" class="nav-link relative" title="Giỏ hàng"><i class="fa fa-shopping-bag text-xl"></i></a>
+                        <a href="{% url 'profile_view' %}" class="nav-link relative" title="Hồ sơ"><i class="fa fa-user text-xl"></i></a>
+                        {% if request.user.role == 'ADMIN' %}
+                            <a href="{% url 'admin_index' %}" class="text-cosmetic-500 hover:text-cosmetic-600 transition text-sm font-medium"><i class="fa fa-shield-alt mr-1"></i>Admin</a>
+                        {% elif request.user.role == 'EMPLOYEE' %}
+                            <a href="{% url 'employee_dashboard' %}" class="text-cosmetic-500 hover:text-cosmetic-600 transition text-sm font-medium"><i class="fa fa-briefcase mr-1"></i>Nhân viên</a>
+                        {% endif %}
+                        <a href="{% url 'logout' %}" class="nav-link" title="Đăng xuất"><i class="fa fa-sign-out-alt"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t mt-auto" style="background-color: var(--footer-bg); border-color: var(--footer-border);">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <span class="text-2xl font-serif font-bold tracking-wider uppercase" style="color: var(--text-color);">Aeterna<span class="text-cosmetic-500">.</span></span>
+                <p class="text-sm mt-2" style="color: var(--text-muted);">Vẻ đẹp trường tồn với thời gian</p>
+            </div>
+            <div class="flex space-x-6" style="color: var(--text-muted);">
+                <a href="#" class="hover:text-cosmetic-500 transition"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="hover:text-cosmetic-500 transition"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="hover:text-cosmetic-500 transition"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications -->
+    {% if messages %}
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[999999] flex flex-col gap-2">
+        {% for msg in messages %}
+        <div class="toast-message bg-cosmetic-600/90 backdrop-blur-md text-white px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.4)] flex items-center gap-3 transform translate-x-[120%] opacity-0 transition-all duration-500">
+            <i class="fa fa-check-circle"></i>
+            <span class="font-medium text-sm">{{ msg.message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(() => {
+            const toasts = document.querySelectorAll('.toast-message');
+            toasts.forEach((toast, index) => {
+                setTimeout(() => {
+                    toast.classList.remove('translate-x-[120%]', 'opacity-0');
+                    setTimeout(() => {
+                        toast.classList.add('translate-x-[120%]', 'opacity-0');
+                        setTimeout(() => toast.remove(), 500);
+                    }, 3000); 
+                }, index * 200); 
+            });
+        }, 100);
+    </script>
+    {% endif %}
+
+    <!-- Theme Toggle Logic & Three.js 3D Background Logic -->
+    <script>
+        // 1. Theme Toggle Logic
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const html = document.documentElement;
+        
+        // Load theme from LocalStorage if exists
+        if (localStorage.getItem('theme') === 'light') {
+            html.classList.remove('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                updateThreeJSTheme('dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                updateThreeJSTheme('light');
+            }
+        });
+
+        // 2. Three.js Sparkling Wind Background - Chuyển giao toàn bộ tính toán sang GPU (GLSL Shader)
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        let currentTheme = html.classList.contains('dark') ? 'dark' : 'light';
+        
+        const darkFog = 0x030712;
+        const lightFog = 0xfdfafb;
+        scene.fog = new THREE.FogExp2(currentTheme === 'dark' ? darkFog : lightFog, 0.002);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        // Thiết lập GPU Hardware Acceleration tối đa
+        const renderer = new THREE.WebGLRenderer({ 
+            alpha: true, 
+            antialias: false,
+            powerPreference: 'high-performance',
+            precision: 'mediump'
+        });
+        
+        renderer.setClearColor(0x000000, 0); 
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // Giới hạn pixelRatio ở 1.75 để tối ưu hóa fillrate GPU trên màn hình 4K/Retina
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+        container.appendChild(renderer.domElement);
+
+        // Tạo texture lấp lánh (hình tròn mờ) bằng Canvas một lần duy nhất lúc khởi tạo
+        const circleCanvas = document.createElement('canvas');
+        circleCanvas.width = 32;
+        circleCanvas.height = 32;
+        const ctx = circleCanvas.getContext('2d');
+        const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+        gradient.addColorStop(0, 'rgba(255,255,255,1)');
+        gradient.addColorStop(0.2, 'rgba(255,255,255,0.8)');
+        gradient.addColorStop(0.5, 'rgba(255,255,255,0.2)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 32, 32);
+        const particleTexture = new THREE.CanvasTexture(circleCanvas);
+
+        // Chuẩn bị dữ liệu hạt (Upload 1 lần duy nhất lên VRAM của GPU)
+        const particlesCount = 800;
+        const posArray = new Float32Array(particlesCount * 3);
+        const velocities = new Float32Array(particlesCount * 3);
+        const colors = new Float32Array(particlesCount * 3);
+        const phases = new Float32Array(particlesCount);
+        const scales = new Float32Array(particlesCount);
+
+        const colorPink = new THREE.Color(0xec4899);
+        const colorOrange = new THREE.Color(0xff8c00);
+        const tempColor = new THREE.Color();
+
+        for(let i = 0; i < particlesCount; i++) {
+            posArray[i*3] = (Math.random() - 0.5) * 60;     // x
+            posArray[i*3+1] = (Math.random() - 0.5) * 40;   // y
+            posArray[i*3+2] = (Math.random() - 0.5) * 20;   // z
+
+            velocities[i*3] = Math.random() * 0.1 + 0.02;      // vx
+            velocities[i*3+1] = (Math.random() - 0.5) * 0.02;  // vy
+            velocities[i*3+2] = (Math.random() - 0.5) * 0.02;  // vz
+
+            phases[i] = Math.random() * Math.PI * 2.0;
+            scales[i] = 0.3 + Math.random() * 0.25;
+
+            const mixRatio = Math.random();
+            tempColor.lerpColors(colorPink, colorOrange, mixRatio);
+            colors[i*3] = tempColor.r;
+            colors[i*3+1] = tempColor.g;
+            colors[i*3+2] = tempColor.b;
+        }
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('aVelocity', new THREE.BufferAttribute(velocities, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+        particlesGeometry.setAttribute('aPhase', new THREE.BufferAttribute(phases, 1));
+        particlesGeometry.setAttribute('aScale', new THREE.BufferAttribute(scales, 1));
+
+        // GPU Custom Shader - Tính toán vị trí và quỹ đạo hạt trực tiếp trên GPU Cores
+        const vertexShader = `
+            uniform float uTime;
+            attribute vec3 aVelocity;
+            attribute float aPhase;
+            attribute float aScale;
+            varying vec3 vColor;
+
+            void main() {
+                vColor = color;
+                vec3 pos = position;
+
+                // GPU tự động tính toán chuyển động tuần hoàn (Wrap-around từ -30 đến +30)
+                float travel = aVelocity.x * uTime * 15.0;
+                pos.x = mod(pos.x + travel + 30.0, 60.0) - 30.0;
+
+                // Hiệu ứng sóng dập dờn mượt mà song song trên GPU
+                pos.y += sin(uTime * 0.8 + aPhase) * 1.5 + sin(pos.x * 0.12 + uTime * 0.4) * 0.8;
+                pos.z += cos(uTime * 0.6 + aPhase) * 0.8;
+
+                vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+                gl_PointSize = (aScale * 38.0) / -mvPosition.z;
+                gl_Position = projectionMatrix * mvPosition;
+            }
+        `;
+
+        const fragmentShader = `
+            uniform sampler2D uTexture;
+            uniform float uOpacity;
+            varying vec3 vColor;
+
+            void main() {
+                vec4 texColor = texture2D(uTexture, gl_PointCoord);
+                gl_FragColor = vec4(vColor, texColor.a * uOpacity);
+            }
+        `;
+
+        const particleMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                uTime: { value: 0 },
+                uTexture: { value: particleTexture },
+                uOpacity: { value: currentTheme === 'dark' ? 0.9 : 0.7 }
+            },
+            vertexShader: vertexShader,
+            fragmentShader: fragmentShader,
+            transparent: true,
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, particleMaterial);
+        scene.add(particlesMesh);
+
+        function updateThreeJSTheme(theme) {
+            if (theme === 'dark') {
+                scene.fog.color.setHex(darkFog);
+                particleMaterial.uniforms.uOpacity.value = 0.85;
+            } else {
+                scene.fog.color.setHex(lightFog);
+                particleMaterial.uniforms.uOpacity.value = 0.6; 
+            }
+        }
+
+        camera.position.z = 10;
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        });
+
+        // Main GPU Render Loop (Zero CPU Data Upload per frame)
+        const clock = new THREE.Clock();
+        let isTabActive = true;
+
+        function animate() {
+            if (!isTabActive) return;
+            requestAnimationFrame(animate);
+
+            // CPU chỉ gửi duy nhất biến thời gian uTime cho GPU (CPU usage ~0%)
+            particleMaterial.uniforms.uTime.value = clock.getElapsedTime();
+
+            // Camera follow
+            camera.position.x += (mouseX * 1.5 - camera.position.x) * 0.05;
+            camera.position.y += (mouseY * 1.5 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Tiết kiệm 100% CPU & GPU khi tab không hiển thị
+        window.addEventListener('gpu-tab-visibility', (e) => {
+            isTabActive = e.detail.active;
+            if (isTabActive) {
+                clock.start();
+                requestAnimationFrame(animate);
+            } else {
+                clock.stop();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // 3. Global Click Effect (Glow & Flowers)
+        // Dùng mousedown để hiệu ứng nổ ra NGAY LẬP TỨC trước khi trang kịp chuyển hướng
+        document.addEventListener('mousedown', function(e) {
+            
+            // 3.1 Phát sáng viền cho Nút bấm/Link
+            const target = e.target.closest('button, a, input[type="submit"]');
+            if (target) {
+                target.classList.add('btn-click-glow');
+                setTimeout(() => target.classList.remove('btn-click-glow'), 400);
+            }
+
+            // Vị trí chuột
+            const x = e.clientX;
+            const y = e.clientY;
+
+            // 3.2 Tạo vầng sáng chớp tắt cực mạnh (Glow burst at mouse)
+            const glow = document.createElement('div');
+            glow.className = 'click-glow';
+            glow.style.left = x + 'px';
+            glow.style.top = y + 'px';
+            document.body.appendChild(glow);
+            setTimeout(() => glow.remove(), 600);
+
+            // 3.3 Tạo các bông hoa lớn và rõ nét bắn ra
+            const numFlowers = 8 + Math.floor(Math.random() * 4); // 8-11 bông
+            for (let i = 0; i < numFlowers; i++) {
+                const flower = document.createElement('i');
+                // Đan xen nhiều loại icon lấp lánh (hoa, sao, tia sáng)
+                const icons = ['fa-spa', 'fa-star', 'fa-asterisk', 'fa-seedling'];
+                flower.className = `fa ${icons[Math.floor(Math.random() * icons.length)]} click-flower`;
+                
+                // Kích thước to rõ hơn (16px - 28px)
+                flower.style.fontSize = (16 + Math.random() * 12) + 'px'; 
+                
+                // Tính toán hướng bay tỏa tròn ngẫu nhiên
+                const angle = (Math.PI * 2 / numFlowers) * i + (Math.random() - 0.5);
+                const distance = 50 + Math.random() * 50; // Bay xa 50-100px
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                const rot = Math.random() * 360 + 180; // Xoay nhiều hơn
+                
+                flower.style.left = x + 'px'; 
+                flower.style.top = y + 'px';
+                flower.style.setProperty('--tx', `${tx}px`);
+                flower.style.setProperty('--ty', `${ty}px`);
+                flower.style.setProperty('--rot', `${rot}deg`);
+                
+                // Màu sắc rực rỡ, độ tương phản cao
+                const colors = ['#ff1493', '#ff69b4', '#00ffff', '#ffb6c1', '#f0e68c'];
+                flower.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
+                document.body.appendChild(flower);
+                setTimeout(() => flower.remove(), 800);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Giỏ hàng của bạn - Aeterna{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-12 relative z-10">
+    <a href="{% url 'index' %}" class="text-cosmetic-500 hover:text-white transition inline-block mb-6 font-medium">
+        <i class="fa fa-arrow-left mr-2"></i> Tiếp tục mua sắm
+    </a>
+    
+    <div class="glass-card rounded-2xl p-8">
+        <h2 class="text-3xl font-serif font-bold text-white mb-8 border-l-4 border-cosmetic-500 pl-4">Giỏ hàng của bạn</h2>
+        
+        {% if messages %}
+        <div class="mb-6">
+            {% for message in messages %}
+            <div class="bg-red-900/50 border border-red-500 text-red-200 px-4 py-3 rounded-lg">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if not cart.items.all %}
+            <div class="text-center py-16">
+                <i class="fa fa-shopping-basket text-6xl text-gray-700 mb-4"></i>
+                <p class="text-gray-400 text-lg">Giỏ hàng của bạn đang trống.</p>
+                <a href="{% url 'index' %}#products" class="mt-6 inline-block bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-3 rounded-full font-medium transition shadow-lg shadow-cosmetic-500/30">
+                    Khám phá sản phẩm
+                </a>
+            </div>
+        {% else %}
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-700">
+                            <th class="pb-4 font-medium uppercase text-sm tracking-wider">Sản phẩm</th>
+                            <th class="pb-4 font-medium uppercase text-sm tracking-wider text-center">Đơn giá</th>
+                            <th class="pb-4 font-medium uppercase text-sm tracking-wider text-center">Số lượng</th>
+                            <th class="pb-4 font-medium uppercase text-sm tracking-wider text-right">Tổng</th>
+                            <th class="pb-4 font-medium uppercase text-sm tracking-wider text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart.items.all %}
+                        <tr class="border-b border-gray-800 hover:bg-gray-800/30 transition">
+                            <td class="py-4">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-16 h-16 bg-gray-900 rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center">
+                                        {% if item.product.image_url %}
+                                        <img src="{{ item.product.image_url }}?v=2" alt="{{ item.product.name }}" class="w-full h-full object-cover opacity-90 hover:opacity-100 transition">
+                                        {% else %}
+                                        <img src="{% static 'images/no-image.png' %}" class="w-10 opacity-50">
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-white font-medium hover:text-cosmetic-500 transition line-clamp-2 max-w-xs">
+                                        {{ item.product.name }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="py-4 text-center text-gray-300">
+                                {{ item.product.price|currency }}
+                            </td>
+                            <td class="py-4 text-center">
+                                <form action="{% url 'update_cart' %}" method="post" class="flex items-center justify-center space-x-2">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="itemId" value="{{ item.id }}">
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" class="w-16 bg-gray-900 border border-gray-700 text-white rounded-lg px-2 py-1 text-center focus:outline-none focus:border-cosmetic-500 transition">
+                                    <button type="submit" class="text-xs bg-gray-700 hover:bg-gray-600 text-white px-2 py-1 rounded transition" title="Cập nhật">
+                                        <i class="fa fa-sync-alt"></i>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="py-4 text-right font-bold text-cosmetic-500">
+                                {{ item.total_price|currency }}
+                            </td>
+                            <td class="py-4 text-right">
+                                <a href="{% url 'remove_cart_item' item.id %}" class="text-red-400 hover:text-red-300 p-2 transition" onclick="return confirm('Bạn có chắc chắn muốn xóa khỏi giỏ?');" title="Xóa">
+                                    <i class="fa fa-trash-alt"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-8 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4 border-t border-gray-800 pt-6">
+                <div class="text-lg">
+                    <span class="text-gray-400">Tổng tiền giỏ hàng:</span>
+                    <span class="text-2xl font-bold text-cosmetic-500 ml-2">{{ cart.total_amount|currency }}</span>
+                </div>
+                <a href="{% url 'checkout' %}" class="bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-4 rounded-full font-bold transition shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] flex items-center">
+                    Tiến hành Thanh toán <i class="fa fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Smart Basket Recommendations (Market Basket Analysis) -->
+    {% if cart_recommendations %}
+    <div class="mt-8 glass-card rounded-2xl p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6 border-b border-gray-800 pb-4">
+            <div>
+                <span class="text-cosmetic-500 font-semibold tracking-wider text-xs uppercase flex items-center gap-1.5 mb-1">
+                    <i class="fa fa-magic"></i> Phân tích Giỏ hàng Thông minh
+                </span>
+                <h3 class="text-xl sm:text-2xl font-serif font-bold text-white">Gợi ý mua kèm dành riêng cho bạn</h3>
+            </div>
+            <p class="text-gray-400 text-xs sm:text-sm">
+                Sản phẩm bổ trợ tối ưu dựa trên các sản phẩm đang có trong giỏ hàng
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {% for rec in cart_recommendations %}
+            <div class="bg-gray-900/60 border border-gray-800 hover:border-cosmetic-500/50 rounded-xl p-4 flex flex-col transition duration-300 group hover:-translate-y-1">
+                <div class="bg-gray-950 rounded-lg overflow-hidden h-36 mb-3 flex items-center justify-center relative border border-gray-800/80">
+                    <a href="{% url 'product_detail' rec.product.id %}" class="w-full h-full flex items-center justify-center p-2">
+                        <img src="{{ rec.product.image_url|default:'/static/images/no-image.png' }}?v=2" alt="{{ rec.product.name }}" class="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-105">
+                    </a>
+                    {% if rec.tag %}
+                    <span class="absolute top-2 left-2 bg-cosmetic-600/90 backdrop-blur text-white text-[9px] font-bold px-2 py-0.5 rounded-full uppercase">
+                        {{ rec.tag }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <div class="flex-1 flex flex-col">
+                    <a href="{% url 'product_detail' rec.product.id %}" class="text-white font-semibold text-xs line-clamp-2 hover:text-cosmetic-400 transition mb-1">
+                        {{ rec.product.name }}
+                    </a>
+                    <p class="text-[11px] text-emerald-400 mb-2">
+                        <i class="fa fa-chart-line text-[10px]"></i> {{ rec.reason }}
+                    </p>
+                    <div class="mt-auto pt-2 border-t border-gray-800 flex items-center justify-between gap-2">
+                        <span class="text-sm font-bold text-cosmetic-500">
+                            {{ rec.product.price|currency }}
+                        </span>
+                        <form action="{% url 'add_to_cart' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="productId" value="{{ rec.product.id }}">
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1 shadow-sm">
+                                <i class="fa fa-plus text-[10px]"></i> Thêm
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

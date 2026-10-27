@@ -1,0 +1,99 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Đăng ký - Aeterna{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 relative z-10 -mt-20">
+    <div class="w-full max-w-5xl glass-card rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row-reverse relative">
+        
+        <!-- Right Side: Image / Branding (Reversed for variation) -->
+        <div class="hidden md:flex md:w-1/2 relative bg-gray-900 overflow-hidden items-center justify-center">
+            <div class="absolute inset-0 bg-gradient-to-tr from-purple-900/40 to-cosmetic-600/20 z-10"></div>
+            <img src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1000&auto=format&fit=crop" alt="Cosmetics Beauty" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay">
+            
+            <div class="relative z-20 text-center px-10">
+                <h2 class="text-4xl font-serif font-bold text-white mb-4">Tham Gia Cùng Chúng Tôi</h2>
+                <p class="text-gray-300 text-lg font-light leading-relaxed">Tạo tài khoản để nhận những ưu đãi độc quyền và trải nghiệm mua sắm đẳng cấp nhất.</p>
+            </div>
+        </div>
+
+        <!-- Left Side: Form -->
+        <div class="w-full md:w-1/2 p-10 sm:p-14 relative bg-gray-900/40 backdrop-blur-md">
+            
+            <!-- Decorative orbs -->
+            <div class="absolute top-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2"></div>
+            <div class="absolute bottom-0 right-0 w-32 h-32 bg-cosmetic-500/20 rounded-full blur-3xl translate-y-1/2 translate-x-1/2"></div>
+
+            <div class="relative z-10">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-serif font-bold text-white mb-2">Tạo tài khoản</h1>
+                    <p class="text-gray-400 text-sm">Bắt đầu hành trình làm đẹp của bạn ngay hôm nay.</p>
+                </div>
+
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for msg in messages %}
+                    <div class="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm flex items-center">
+                        <i class="fa fa-exclamation-circle mr-2"></i> {{ msg }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form action="{% url 'register' %}" method="post" class="space-y-5">
+                    {% csrf_token %}
+                    
+                    <div class="group">
+                        <label class="block text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wider group-focus-within:text-cosmetic-500 transition-colors">Tên đăng nhập</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cosmetic-500 transition-colors">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <input type="text" name="username" required placeholder="Chọn một tên dễ nhớ"
+                                class="w-full bg-gray-800/50 border border-gray-700/50 text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-cosmetic-500 focus:bg-gray-800 transition-all shadow-inner placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wider group-focus-within:text-cosmetic-500 transition-colors">Email</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cosmetic-500 transition-colors">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+                            <input type="email" name="email" required placeholder="email@example.com"
+                                class="w-full bg-gray-800/50 border border-gray-700/50 text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-cosmetic-500 focus:bg-gray-800 transition-all shadow-inner placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <label class="block text-gray-400 text-xs font-medium mb-1.5 uppercase tracking-wider group-focus-within:text-cosmetic-500 transition-colors">Mật khẩu</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cosmetic-500 transition-colors">
+                                <i class="fa fa-lock"></i>
+                            </div>
+                            <input type="password" name="password" required placeholder="Tạo mật khẩu mạnh"
+                                class="w-full bg-gray-800/50 border border-gray-700/50 text-white rounded-xl pl-11 pr-4 py-3.5 focus:outline-none focus:border-cosmetic-500 focus:bg-gray-800 transition-all shadow-inner placeholder-gray-600">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-4">
+                        <button type="submit" class="w-full relative group overflow-hidden bg-cosmetic-600 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:-translate-y-1">
+                            <span class="relative z-10 flex items-center justify-center">
+                                TẠO TÀI KHOẢN <i class="fa fa-user-plus ml-2 group-hover:scale-110 transition-transform"></i>
+                            </span>
+                            <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 to-cosmetic-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-8 text-center border-t border-gray-700/50 pt-6">
+                    <p class="text-gray-400 text-sm">Đã có tài khoản? 
+                        <a href="{% url 'login' %}" class="text-cosmetic-400 hover:text-white font-semibold transition underline decoration-transparent hover:decoration-white underline-offset-4">Đăng nhập</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

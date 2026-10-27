@@ -1,0 +1,100 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+    <h2><i class="fa fa-box"></i> Quản lý Sản phẩm</h2>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <form method="get" action="{% url 'admin_products' %}" style="display: flex; gap: 8px; margin: 0;">
+            <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm tên, thương hiệu, danh mục..." style="width: 250px; margin-bottom: 0;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 16px;">
+                <i class="fa fa-search"></i>
+            </button>
+            {% if tu_khoa %}
+            <a href="{% url 'admin_products' %}" class="btn btn-warning" style="padding: 10px 14px; color: #fff;">
+                <i class="fa fa-times"></i>
+            </a>
+            {% endif %}
+        </form>
+        <a href="{% url 'admin_add_product' %}" class="btn btn-success"><i class="fa fa-plus"></i> Thêm Sản phẩm</a>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th style="padding-left: 20px;">ID</th>
+                <th>Hình ảnh</th>
+                <th>Tên Sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Kho</th>
+                <th style="width: 150px; text-align: center; padding-right: 20px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td style="padding-left: 20px;">{{ p.id }}</td>
+                <td>
+                    {% if p.image_url %}
+                    <img src="{{ p.image_url }}?v=2" alt="IMG" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">
+                    {% endif %}
+                </td>
+                <td><strong>{{ p.name }}</strong></td>
+                <td>{{ p.category.name }}</td>
+                <td style="color: #ec4899; font-weight: bold;">{{ p.price|currency }}</td>
+                <td>
+                    <span class="{% if p.stock_quantity <= 5 %}text-danger font-weight-bold{% endif %}">
+                        {{ p.stock_quantity }}
+                    </span>
+                </td>
+                <td style="text-align: center; padding-right: 20px;">
+                    <a href="{% url 'admin_edit_product' p.id %}" class="btn btn-warning" title="Sửa" style="padding: 5px 10px;"><i class="fa fa-edit"></i></a>
+                    <a href="{% url 'admin_delete_product' p.id %}" class="btn btn-danger" title="Xóa" style="padding: 5px 10px;" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');"><i class="fa fa-trash"></i></a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 30px; color: #9ca3af;">
+                    Không tìm thấy sản phẩm nào phù hợp.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if products.has_other_pages %}
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 25px; border-top: 1px solid rgba(255,255,255,0.05); flex-wrap: wrap; gap: 12px;">
+        <div style="color: #9ca3af; font-size: 0.9rem;">
+            Trang <strong style="color: #fff;">{{ products.number }}</strong> / {{ products.paginator.num_pages }} (Tổng <strong style="color: #ec4899;">{{ products.paginator.count }}</strong> sản phẩm)
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+            {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}{% if tu_khoa %}&q={{ tu_khoa }}{% endif %}" class="btn" style="background: rgba(255,255,255,0.08); color: #fff; padding: 6px 12px; font-size: 0.85rem;">
+                <i class="fa fa-chevron-left"></i> Trước
+            </a>
+            {% endif %}
+
+            {% for so in products.paginator.page_range %}
+                {% if products.number == so %}
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: #ec4899; color: #fff; font-weight: 700; font-size: 0.85rem;">
+                    {{ so }}
+                </span>
+                {% elif so > products.number|add:'-3' and so < products.number|add:'3' %}
+                <a href="?page={{ so }}{% if tu_khoa %}&q={{ tu_khoa }}{% endif %}" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #d1d5db; text-decoration: none; font-size: 0.85rem;">
+                    {{ so }}
+                </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}{% if tu_khoa %}&q={{ tu_khoa }}{% endif %}" class="btn" style="background: rgba(255,255,255,0.08); color: #fff; padding: 6px 12px; font-size: 0.85rem;">
+                Sau <i class="fa fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

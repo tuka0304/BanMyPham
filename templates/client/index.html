@@ -1,0 +1,131 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Aeterna - Mỹ Phẩm Cao Cấp{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <div class="relative min-h-screen flex items-center justify-center pt-20 -mt-24">
+        <div class="hero-content text-center px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto">
+            <span class="block text-cosmetic-500 font-medium tracking-[0.2em] uppercase mb-4 text-sm sm:text-base">Đỉnh Cao Phái Đẹp</span>
+            <h1 class="text-5xl sm:text-7xl font-serif font-bold mb-6 leading-tight" style="color: var(--text-color);">
+                Đánh Thức <br> <span class="text-gradient">Vẻ Đẹp Hoàn Mỹ</span>
+            </h1>
+            <p class="mt-4 text-xl max-w-2xl mx-auto font-light mb-10" style="color: var(--text-muted);">
+                Khám phá bộ sưu tập mỹ phẩm cao cấp với công thức độc quyền, nuôi dưỡng và tôn vinh nét rạng ngời tự nhiên của bạn.
+            </p>
+            <div class="flex justify-center gap-4">
+                <a href="#products" class="bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-4 rounded-full font-medium transition duration-300 shadow-[0_0_20px_rgba(236,72,153,0.4)] hover:shadow-[0_0_30px_rgba(236,72,153,0.6)]">
+                    Khám Phá Ngay
+                </a>
+                <a href="#" class="bg-transparent border border-gray-400 dark:border-gray-500 hover:border-gray-900 dark:hover:border-white text-gray-900 dark:text-white px-8 py-4 rounded-full font-medium transition duration-300">
+                    Về Chúng Tôi
+                </a>
+            </div>
+        </div>
+        
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce z-10">
+            <a href="#products" style="color: var(--text-muted);" class="hover:text-cosmetic-500 transition">
+                <i class="fa fa-chevron-down"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Products Section -->
+    <div id="products" class="py-24 relative z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-serif font-bold mb-4" style="color: var(--text-color);">Sản Phẩm <span class="text-cosmetic-500">Nổi Bật</span></h2>
+                <div class="w-24 h-1 bg-cosmetic-600 mx-auto rounded-full mb-8"></div>
+                
+                <form action="{% url 'index' %}#products" method="get" class="max-w-2xl mx-auto flex flex-col sm:flex-row gap-4">
+                    <input type="text" name="q" value="{{ q|default:'' }}" placeholder="Tìm kiếm sản phẩm..." class="form-input-themed flex-1 px-6 py-3 rounded-xl focus:outline-none transition">
+                    <select name="category_id" class="form-input-themed px-6 py-3 rounded-xl focus:outline-none transition">
+                        <option value="">Tất cả danh mục</option>
+                        {% for c in categories %}
+                            <option value="{{ c.id }}" {% if cat_id == c.id|stringformat:"s" %}selected{% endif %}>{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="bg-cosmetic-600 hover:bg-cosmetic-500 text-white px-8 py-3 rounded-xl transition font-medium shadow-lg shadow-cosmetic-500/20">Lọc</button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {% for product in products %}
+                <div class="glass-card rounded-2xl overflow-hidden flex flex-col group">
+                    <div class="relative h-64 overflow-hidden bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+                        {% if product.image_url %}
+                        <img src="{{ product.image_url }}?v=2" alt="{{ product.name }}" class="h-full w-full object-cover transition duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100 mix-blend-multiply dark:mix-blend-normal">
+                        {% else %}
+                        <img src="{% static 'images/no-image.png' %}" alt="No image" class="h-32 opacity-50">
+                        {% endif %}
+                        
+                        <div class="absolute top-4 right-4 bg-cosmetic-600/90 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm shadow-sm">
+                            HOT
+                        </div>
+                    </div>
+                    
+                    <div class="p-6 flex flex-col flex-grow">
+                        <div class="text-xs text-cosmetic-500 font-medium mb-2 uppercase tracking-wider">{{ product.category.name }}</div>
+                        <a href="{% url 'product_detail' product.id %}" class="text-lg font-serif font-bold hover:text-cosmetic-500 transition mb-2 line-clamp-2" style="color: var(--text-color);" title="{{ product.name }}">{{ product.name }}</a>
+                        <p class="text-sm line-clamp-2 mb-4" style="color: var(--text-muted);">{{ product.description }}</p>
+                        
+                        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                            <span class="text-xl font-bold" style="color: var(--text-color);">{{ product.price|currency }}</span>
+                        </div>
+                        
+                        <div class="mt-4 flex gap-2">
+                            <a href="{% url 'product_detail' product.id %}" class="flex-1 text-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2.5 rounded-xl text-sm font-medium transition">Chi tiết</a>
+                            <form action="{% url 'add_to_cart' %}" method="post" class="flex-1">
+                                {% csrf_token %}
+                                <input type="hidden" name="productId" value="{{ product.id }}">
+                                <input type="hidden" name="quantity" value="1">
+                                {% if request.user.is_authenticated %}
+                                <button type="submit" class="w-full bg-cosmetic-600 hover:bg-cosmetic-500 text-white py-2.5 rounded-xl text-sm font-medium transition shadow-lg shadow-cosmetic-500/20">Thêm giỏ</button>
+                                {% else %}
+                                <a href="{% url 'login' %}" class="block w-full text-center bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 py-2.5 rounded-xl text-sm font-medium">Đăng nhập</a>
+                                {% endif %}
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-span-full text-center py-12" style="color: var(--text-muted);">
+                    Chưa có sản phẩm nào.
+                </div>
+                {% endfor %}
+            </div>
+
+            {% if products.has_other_pages %}
+            <div class="mt-16 flex justify-center items-center gap-2 flex-wrap">
+                {% if products.has_previous %}
+                <a href="?page={{ products.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if cat_id %}&category_id={{ cat_id }}{% endif %}#products" 
+                   class="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-cosmetic-500 hover:text-cosmetic-500 transition text-sm font-medium">
+                    <i class="fa fa-chevron-left mr-1"></i> Trước
+                </a>
+                {% endif %}
+
+                {% for so in products.paginator.page_range %}
+                    {% if products.number == so %}
+                    <span class="w-10 h-10 flex items-center justify-center rounded-xl bg-cosmetic-600 text-white font-bold text-sm shadow-lg shadow-cosmetic-500/20">
+                        {{ so }}
+                    </span>
+                    {% elif so > products.number|add:'-3' and so < products.number|add:'3' %}
+                    <a href="?page={{ so }}{% if q %}&q={{ q }}{% endif %}{% if cat_id %}&category_id={{ cat_id }}{% endif %}#products" 
+                       class="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-cosmetic-500 hover:text-cosmetic-500 transition text-sm font-medium">
+                        {{ so }}
+                    </a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if cat_id %}&category_id={{ cat_id }}{% endif %}#products" 
+                   class="px-4 py-2.5 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:border-cosmetic-500 hover:text-cosmetic-500 transition text-sm font-medium">
+                    Sau <i class="fa fa-chevron-right ml-1"></i>
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

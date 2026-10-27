@@ -1,0 +1,53 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div class="card">
+    <h2><i class="fa fa-tags"></i> Yêu cầu điều chỉnh giá</h2>
+    
+    {% if not requests %}
+        <p style="text-align: center; color: #888; padding: 30px;">Không có yêu cầu điều chỉnh giá nào.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Người yêu cầu</th>
+                    <th>Giá cũ</th>
+                    <th>Giá đề xuất</th>
+                    <th>Lý do</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>{{ req.product.name }}</td>
+                    <td>{{ req.requested_by.username }}<br><small>{{ req.created_at|date:"d/m/Y H:i" }}</small></td>
+                    <td><del style="color: #999;">{{ req.old_price|currency }}</del></td>
+                    <td style="color: #e91e63; font-weight: bold;">{{ req.new_price|currency }}</td>
+                    <td>{{ req.reason }}</td>
+                    <td>
+                        {% if req.status == 'PENDING' %}
+                            <span style="background: #ffc107; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Đang chờ</span>
+                        {% elif req.status == 'APPROVED' %}
+                            <span style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Đã duyệt</span>
+                        {% else %}
+                            <span style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Từ chối</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if req.status == 'PENDING' %}
+                            <a href="{% url 'admin_handle_price_request' req.id 'approve' %}" class="btn btn-success" style="padding: 4px 8px; font-size: 12px;" onclick="return confirm('Duyệt giá mới này?');">Duyệt</a>
+                            <a href="{% url 'admin_handle_price_request' req.id 'reject' %}" class="btn btn-danger" style="padding: 4px 8px; font-size: 12px;" onclick="return confirm('Từ chối yêu cầu?');">Từ chối</a>
+                        {% else %}
+                            -
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

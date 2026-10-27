@@ -1,0 +1,85 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div class="card" style="max-width: 800px; margin: 0 auto; padding: 30px;">
+    <h2 style="color: var(--primary); margin-bottom: 20px; border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;">
+        <i class="fas fa-box-open"></i> <span>{% if product.id %}Chỉnh sửa sản phẩm{% else %}Thêm sản phẩm mới{% endif %}</span>
+    </h2>
+
+    <form action="{% url 'admin_save_product' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ product.id|default_if_none:'' }}">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Tên sản phẩm (*):</label>
+                    <input type="text" name="name" value="{{ product.name|default_if_none:'' }}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Danh mục (*):</label>
+                    <select name="category" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        <option value="">-- Chọn danh mục --</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.id }}" {% if product.category_id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Giá bán (VNĐ) (*):</label>
+                    <input type="number" name="price" value="{{ product.price|default_if_none:'' }}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Số lượng kho (*):</label>
+                    <input type="number" name="stockQuantity" value="{{ product.stock_quantity|default_if_none:'0' }}" required style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+                </div>
+            </div>
+
+            <div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Hình ảnh sản phẩm:</label>
+                    
+                    <input type="file" id="fileImage" name="imageProduct" accept="image/png, image/jpeg, image/webp" 
+                           style="width: 100%; padding: 8px; border: 1px dashed #ccc; border-radius: 5px; background: #f9f9f9;">
+                    
+                    <div style="margin-top: 15px; text-align: center; border: 1px solid #eee; padding: 10px; border-radius: 10px; background: #fff;">
+                        {% if product.image_url %}
+                        <img id="thumbnail" alt="Xem trước ảnh" src="{{ product.image_url }}" style="max-width: 100%; height: 200px; object-fit: contain; border-radius: 8px;">
+                        {% else %}
+                        <img id="thumbnail" alt="Xem trước ảnh" src="https://via.placeholder.com/200x200?text=Chưa+có+ảnh" style="max-width: 100%; height: 200px; object-fit: contain; border-radius: 8px;">
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 20px; margin-top: 10px;">
+            <label style="font-weight: bold; display: block; margin-bottom: 5px;">Mô tả sản phẩm:</label>
+            <textarea name="description" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">{{ product.description|default_if_none:'' }}</textarea>
+        </div>
+
+        <div style="text-align: right; border-top: 1px solid #eee; padding-top: 20px;">
+            <a href="{% url 'admin_products' %}" style="padding: 10px 20px; color: #666; text-decoration: none; margin-right: 15px;">Hủy bỏ</a>
+            <button type="submit" style="background: #f06292; color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+                <i class="fas fa-save"></i> Lưu Sản Phẩm
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.getElementById('fileImage').addEventListener('change', function(event) {
+        var file = event.target.files[0];
+        if (file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('thumbnail').setAttribute('src', e.target.result);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
+{% endblock %}

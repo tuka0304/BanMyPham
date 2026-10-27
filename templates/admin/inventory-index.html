@@ -1,0 +1,70 @@
+{% extends 'admin/layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <h2><i class="fa fa-warehouse"></i> Quản lý Kho Hàng</h2>
+    <p style="color: #9ca3af; margin-top: -15px; margin-bottom: 25px;">Cập nhật nhanh số lượng sản phẩm khi nhập kho.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>SẢN PHẨM</th>
+                <th style="text-align: center;">ẢNH</th>
+                <th style="text-align: center;">TỒN KHO HIỆN TẠI</th>
+                <th style="text-align: right;">NHẬP THÊM (SỐ LƯỢNG)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+                <td>
+                    <div style="font-weight: 600; color: #fff; font-size: 1.1rem; margin-bottom: 5px;">{{ p.name }}</div>
+                    <span style="font-size: 0.8rem; background: rgba(255,255,255,0.1); color: #d1d5db; padding: 3px 8px; border-radius: 6px;">
+                        SKU: {{ p.id }}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    {% if p.image_url %}
+                    <img src="{{ p.image_url }}?v=2" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                    {% else %}
+                    <img src="{% static 'images/no-image.png' %}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); opacity: 0.5;">
+                    {% endif %}
+                </td>
+                <td style="text-align: center;">
+                    {% if p.stock_quantity <= 5 %}
+                    <div style="display: inline-block; min-width: 45px; padding: 6px 12px; border-radius: 8px; font-weight: 700; background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        {{ p.stock_quantity }}
+                    </div>
+                    {% else %}
+                    <div style="display: inline-block; min-width: 45px; padding: 6px 12px; border-radius: 8px; font-weight: 700; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        {{ p.stock_quantity }}
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="text-align: right;">
+                    <form action="{% url 'admin_add_stock' %}" method="post" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin: 0;">
+                        {% csrf_token %}
+                        <input type="hidden" name="productId" value="{{ p.id }}">
+                        
+                        <div style="display: flex; align-items: center; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0 8px;">
+                            <span style="color: #ec4899; font-size: 14px; font-weight: bold; margin-right: 2px;">+</span>
+                            <input type="number" name="quantity" value="1" min="1" 
+                                   style="width: 60px; border: none; background: transparent; padding: 8px 5px; outline: none; font-weight: 600; text-align: center; margin: 0;">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-plus-circle"></i> Cập nhật
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Chưa có sản phẩm nào trong kho.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

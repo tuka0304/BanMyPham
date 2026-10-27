@@ -1,0 +1,106 @@
+{% extends khung_giao_dien %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 12px;">
+            <i class="fa fa-store-alt" style="color: #ec4899;"></i> Quản Lý Chi Nhánh
+        </h2>
+        <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 0.95rem;">Quản lý hệ thống điểm bán hàng, kho chi nhánh và người phụ trách.</p>
+    </div>
+    <a href="{% url 'danh_sach_phieu_kho' %}" class="btn" style="background: rgba(255,255,255,0.08); color: #d1d5db; border: 1px solid rgba(255,255,255,0.15);">
+        <i class="fa fa-dolly"></i> Xem Phiếu Xuất Nhập
+    </a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 360px; gap: 25px;">
+    <div>
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="padding-left: 25px;">TÊN CHI NHÁNH</th>
+                        <th>ĐỊA CHỈ</th>
+                        <th>SỐ ĐIỆN THOẠI</th>
+                        <th>NGƯỜI QUẢN LÝ</th>
+                        <th style="text-align: center; padding-right: 25px;">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cn in danh_sach_chi_nhanh %}
+                    <tr>
+                        <td style="padding-left: 25px;">
+                            <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">{{ cn.ten_chi_nhanh }}</div>
+                            <span style="font-size: 0.8rem; color: #34d399; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px;">
+                                Hoạt động
+                            </span>
+                        </td>
+                        <td style="color: #d1d5db; max-width: 250px;">
+                            {{ cn.dia_chi|default:"Chưa có địa chỉ" }}
+                        </td>
+                        <td style="color: #60a5fa; font-weight: 500;">
+                            {{ cn.so_dien_thoai|default:"-" }}
+                        </td>
+                        <td>
+                            <span style="display: inline-block; background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; color: #e5e7eb;">
+                                <i class="fa fa-user-tie" style="color: #ec4899; margin-right: 4px;"></i> {{ cn.quan_ly|default:"Chưa phân công" }}
+                            </span>
+                        </td>
+                        <td style="text-align: center; padding-right: 25px;">
+                            {% if request.user.role == 'ADMIN' %}
+                            <a href="{% url 'xoa_chi_nhanh' cn.id %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;" onclick="return confirm('Bạn có chắc muốn xóa chi nhánh này?')">
+                                <i class="fa fa-trash"></i> Xóa
+                            </a>
+                            {% else %}
+                            <span style="color: #6b7280; font-size: 0.85rem;">Chỉ xem</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Chưa có chi nhánh nào trong hệ thống. Hãy thêm mới bên dưới!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <h3 style="color: #fff; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-plus-circle" style="color: #ec4899;"></i> Thêm Chi Nhánh Mới
+            </h3>
+
+            <form method="post" action="{% url 'them_chi_nhanh' %}">
+                {% csrf_token %}
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Tên chi nhánh *</label>
+                    <input type="text" name="ten_chi_nhanh" required placeholder="Ví dụ: Chi nhánh Quận 1" style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Địa chỉ</label>
+                    <textarea name="dia_chi" rows="2" placeholder="Địa chỉ chi nhánh..." style="margin-bottom: 0;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Số điện thoại</label>
+                    <input type="text" name="so_dien_thoai" placeholder="0901234567" style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 22px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Người quản lý phụ trách</label>
+                    <input type="text" name="quan_ly" placeholder="Tên quản lý chi nhánh..." style="margin-bottom: 0;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 10px;">
+                    <i class="fa fa-check"></i> Lưu Chi Nhánh
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

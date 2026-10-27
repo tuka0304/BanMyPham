@@ -1,0 +1,91 @@
+{% extends 'client/base.html' %}
+{% load static %}
+
+{% block title %}Đăng nhập - Aeterna{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20 relative z-10 -mt-20">
+    <div class="w-full max-w-5xl glass-card rounded-[2rem] overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+        
+        <!-- Left Side: Image / Branding -->
+        <div class="hidden md:flex md:w-1/2 relative bg-gray-900 overflow-hidden items-center justify-center">
+            <div class="absolute inset-0 bg-gradient-to-br from-cosmetic-600/20 to-purple-900/40 z-10"></div>
+            <img src="https://images.unsplash.com/photo-1616683693504-3ea7e9ad6fec?q=80&w=1000&auto=format&fit=crop" alt="Cosmetics" class="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay">
+            
+            <div class="relative z-20 text-center px-10">
+                <h2 class="text-4xl font-serif font-bold text-white mb-4">Aeterna<span class="text-cosmetic-500">.</span></h2>
+                <p class="text-gray-300 text-lg font-light leading-relaxed">Đánh thức vẻ đẹp tiềm ẩn, tỏa sáng rạng ngời mỗi ngày cùng những tuyệt tác mỹ phẩm của chúng tôi.</p>
+            </div>
+        </div>
+
+        <!-- Right Side: Form -->
+        <div class="w-full md:w-1/2 p-10 sm:p-14 relative bg-gray-900/40 backdrop-blur-md">
+            
+            <!-- Decorative orbs -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-cosmetic-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+            <div class="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+
+            <div class="relative z-10">
+                <div class="mb-10">
+                    <h1 class="text-3xl font-serif font-bold text-white mb-2">Chào mừng trở lại</h1>
+                    <p class="text-gray-400 text-sm">Vui lòng đăng nhập để tiếp tục khám phá.</p>
+                </div>
+
+                {% if messages %}
+                <div class="mb-6 space-y-2">
+                    {% for msg in messages %}
+                    <div class="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-xl text-sm flex items-center">
+                        <i class="fa fa-exclamation-circle mr-2"></i> {{ msg.message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <form action="{% url 'login' %}" method="post" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="group">
+                        <label class="block text-gray-400 text-xs font-medium mb-2 uppercase tracking-wider group-focus-within:text-cosmetic-500 transition-colors">Tên đăng nhập</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cosmetic-500 transition-colors">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <input type="text" name="username" required placeholder="Nhập tài khoản của bạn"
+                                class="w-full bg-gray-800/50 border border-gray-700/50 text-white rounded-xl pl-11 pr-4 py-4 focus:outline-none focus:border-cosmetic-500 focus:bg-gray-800 transition-all shadow-inner placeholder-gray-600">
+                        </div>
+                    </div>
+
+                    <div class="group">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-gray-400 text-xs font-medium uppercase tracking-wider group-focus-within:text-cosmetic-500 transition-colors">Mật khẩu</label>
+                            <a href="#" class="text-xs text-cosmetic-500 hover:text-white transition-colors">Quên mật khẩu?</a>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 group-focus-within:text-cosmetic-500 transition-colors">
+                                <i class="fa fa-lock"></i>
+                            </div>
+                            <input type="password" name="password" required placeholder="••••••••"
+                                class="w-full bg-gray-800/50 border border-gray-700/50 text-white rounded-xl pl-11 pr-4 py-4 focus:outline-none focus:border-cosmetic-500 focus:bg-gray-800 transition-all shadow-inner placeholder-gray-600">
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="submit" class="w-full relative group overflow-hidden bg-cosmetic-600 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] transform hover:-translate-y-1">
+                            <span class="relative z-10 flex items-center justify-center">
+                                ĐĂNG NHẬP <i class="fa fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                            </span>
+                            <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-cosmetic-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="mt-8 text-center">
+                    <p class="text-gray-400 text-sm">Chưa có tài khoản? 
+                        <a href="{% url 'register' %}" class="text-cosmetic-400 hover:text-white font-semibold transition underline decoration-transparent hover:decoration-white underline-offset-4">Tạo tài khoản ngay</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

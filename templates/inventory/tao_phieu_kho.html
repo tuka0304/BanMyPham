@@ -1,0 +1,226 @@
+{% extends khung_giao_dien %}
+{% load custom_filters %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 12px;">
+            <i class="fa fa-file-invoice" style="color: #ec4899;"></i> Lập Phiếu Xuất / Nhập Kho
+        </h2>
+        <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 0.95rem;">Điền đầy đủ thông tin giao dịch kho để cập nhật tự động tồn kho hệ thống.</p>
+    </div>
+    <a href="{% url 'danh_sach_phieu_kho' %}" class="btn" style="background: rgba(255,255,255,0.08); color: #d1d5db; border: 1px solid rgba(255,255,255,0.1);">
+        <i class="fa fa-arrow-left"></i> Quay lại danh sách
+    </a>
+</div>
+
+<form method="post" action="{% url 'tao_phieu_kho' %}" id="bieu_mau_kho">
+    {% csrf_token %}
+    <div style="display: grid; grid-template-columns: 1fr 340px; gap: 25px;">
+        <div>
+            <div class="card" style="margin-bottom: 25px;">
+                <h3 style="color: #fff; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa fa-boxes" style="color: #ec4899;"></i> Danh Sách Mặt Hàng
+                </h3>
+
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width: 40%;">SẢN PHẨM</th>
+                                <th style="width: 15%; text-align: center;">TỒN HIỆN TẠI</th>
+                                <th style="width: 15%; text-align: center;">SỐ LƯỢNG</th>
+                                <th style="width: 18%; text-align: right;">ĐƠN GIÁ (VNĐ)</th>
+                                <th style="width: 12%; text-align: center;">XÓA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="than_bang_san_pham">
+                            <tr class="dong_san_pham">
+                                <td>
+                                    <select name="san_pham_id[]" class="chon_san_pham" required style="margin-bottom: 0;" onchange="cap_nhat_san_pham(this)">
+                                        <option value="" data-gia="0" data-ton="0">-- Chọn sản phẩm --</option>
+                                        {% for sp in danh_sach_san_pham %}
+                                        <option value="{{ sp.id }}" data-gia="{{ sp.price }}" data-ton="{{ sp.stock_quantity }}">
+                                            {{ sp.name }} ({{ sp.brand|default:"Chính hãng" }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span class="nhan_ton_kho" style="display: inline-block; padding: 4px 10px; border-radius: 6px; font-weight: 700; background: rgba(255,255,255,0.08); color: #d1d5db;">0</span>
+                                </td>
+                                <td>
+                                    <input type="number" name="so_luong[]" class="nhap_so_luong" value="1" min="1" required style="text-align: center; margin-bottom: 0;" oninput="tinh_tong_tien()">
+                                </td>
+                                <td>
+                                    <input type="number" name="don_gia[]" class="nhap_don_gia" value="0" min="0" step="1000" required style="text-align: right; margin-bottom: 0;" oninput="tinh_tong_tien()">
+                                </td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn btn-danger" style="padding: 8px 12px; border-radius: 8px;" onclick="xoa_dong(this)">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                    <button type="button" class="btn" style="background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);" onclick="them_dong_san_pham()">
+                        <i class="fa fa-plus"></i> Thêm sản phẩm khác
+                    </button>
+                    <div style="font-size: 1.1rem; color: #fff;">
+                        Tổng ước tính: <span id="hien_thi_tong_tien" style="font-weight: 800; color: #34d399; font-size: 1.3rem;">0 đ</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 style="color: #fff; font-size: 1.2rem; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa fa-sticky-note" style="color: #ec4899;"></i> Ghi Chú & Diễn Giải
+                </h3>
+                <textarea name="ghi_chu" rows="3" placeholder="Nhập ghi chú thêm cho giao dịch kho (nếu có)..." style="margin-bottom: 0;"></textarea>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <h3 style="color: #fff; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa fa-cog" style="color: #ec4899;"></i> Thông Tin Phiếu
+                </h3>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Loại giao dịch *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
+                        <label style="cursor: pointer; margin: 0;">
+                            <input type="radio" name="loai_phieu" value="NHAP" checked onchange="doi_loai_phieu(this.value)" style="display: none;" id="loai_nhap">
+                            <div id="the_nhap" style="border: 2px solid #10b981; background: rgba(16, 185, 129, 0.15); color: #34d399; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fa fa-arrow-down"></i> Nhập kho
+                            </div>
+                        </label>
+                        <label style="cursor: pointer; margin: 0;">
+                            <input type="radio" name="loai_phieu" value="XUAT" onchange="doi_loai_phieu(this.value)" style="display: none;" id="loai_xuat">
+                            <div id="the_xuat" style="border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #9ca3af; text-align: center; padding: 12px; border-radius: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fa fa-arrow-up"></i> Xuất kho
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Chi nhánh thực hiện *</label>
+                    <select name="chi_nhanh_id" required style="margin-bottom: 0;">
+                        <option value="">-- Chọn chi nhánh --</option>
+                        {% for cn in danh_sach_chi_nhanh %}
+                        <option value="{{ cn.id }}">{{ cn.ten_chi_nhanh }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 18px;" id="khoi_nha_cung_cap">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Nhà cung cấp</label>
+                    <select name="nha_cung_cap_id" id="chon_ncc" style="margin-bottom: 0;">
+                        <option value="">-- Chọn nhà cung cấp --</option>
+                        {% for ncc in danh_sach_nha_cung_cap %}
+                        <option value="{{ ncc.id }}">{{ ncc.ten_nha_cung_cap }}</option>
+                        {% endfor %}
+                    </select>
+                    <small style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px; display: block;">Áp dụng chính cho phiếu nhập kho từ đối tác.</small>
+                </div>
+
+                <div style="margin-bottom: 22px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Tên nhân viên nhận / thực hiện *</label>
+                    <input type="text" name="nhan_vien_nhan" value="{{ request.user.username }}" required placeholder="Tên nhân viên nhận hàng..." style="margin-bottom: 0;">
+                    <small style="color: #9ca3af; font-size: 0.8rem; margin-top: 4px; display: block;">Tên nhân viên ký biên bản hoặc nhận hàng vào kho.</small>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1rem; font-weight: 700; border-radius: 12px;">
+                    <i class="fa fa-save"></i> Xác Nhận Lưu Phiếu
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+function doi_loai_phieu(loai) {
+    var the_nhap = document.getElementById('the_nhap');
+    var the_xuat = document.getElementById('the_xuat');
+    var khoi_ncc = document.getElementById('khoi_nha_cung_cap');
+    if (loai === 'NHAP') {
+        the_nhap.style.border = '2px solid #10b981';
+        the_nhap.style.background = 'rgba(16, 185, 129, 0.15)';
+        the_nhap.style.color = '#34d399';
+        the_xuat.style.border = '1px solid rgba(255,255,255,0.1)';
+        the_xuat.style.background = 'rgba(0,0,0,0.2)';
+        the_xuat.style.color = '#9ca3af';
+        khoi_ncc.style.opacity = '1';
+    } else {
+        the_xuat.style.border = '2px solid #f43f5e';
+        the_xuat.style.background = 'rgba(244, 63, 94, 0.15)';
+        the_xuat.style.color = '#fb7185';
+        the_nhap.style.border = '1px solid rgba(255,255,255,0.1)';
+        the_nhap.style.background = 'rgba(0,0,0,0.2)';
+        the_nhap.style.color = '#9ca3af';
+        khoi_ncc.style.opacity = '0.6';
+    }
+}
+
+function cap_nhat_san_pham(phan_tu_select) {
+    var dong = phan_tu_select.closest('.dong_san_pham');
+    var lua_chon = phan_tu_select.options[phan_tu_select.selectedIndex];
+    var gia = lua_chon.getAttribute('data-gia') || 0;
+    var ton = lua_chon.getAttribute('data-ton') || 0;
+    
+    var o_gia = dong.querySelector('.nhap_don_gia');
+    var nhan_ton = dong.querySelector('.nhan_ton_kho');
+    
+    o_gia.value = gia;
+    nhan_ton.textContent = ton;
+    if (parseInt(ton) <= 5) {
+        nhan_ton.style.color = '#f87171';
+        nhan_ton.style.background = 'rgba(239, 68, 68, 0.2)';
+    } else {
+        nhan_ton.style.color = '#34d399';
+        nhan_ton.style.background = 'rgba(16, 185, 129, 0.2)';
+    }
+    tinh_tong_tien();
+}
+
+function tinh_tong_tien() {
+    var danh_sach_dong = document.querySelectorAll('.dong_san_pham');
+    var tong = 0;
+    danh_sach_dong.forEach(function(dong) {
+        var sl = parseFloat(dong.querySelector('.nhap_so_luong').value) || 0;
+        var gia = parseFloat(dong.querySelector('.nhap_don_gia').value) || 0;
+        tong += (sl * gia);
+    });
+    var dinh_dang = Math.round(tong).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ";
+    document.getElementById('hien_thi_tong_tien').textContent = dinh_dang;
+}
+
+function them_dong_san_pham() {
+    var than_bang = document.getElementById('than_bang_san_pham');
+    var dong_dau = document.querySelector('.dong_san_pham');
+    var dong_moi = dong_dau.cloneNode(true);
+    dong_moi.querySelector('.chon_san_pham').selectedIndex = 0;
+    dong_moi.querySelector('.nhan_ton_kho').textContent = '0';
+    dong_moi.querySelector('.nhan_ton_kho').style.color = '#d1d5db';
+    dong_moi.querySelector('.nhan_ton_kho').style.background = 'rgba(255,255,255,0.08)';
+    dong_moi.querySelector('.nhap_so_luong').value = '1';
+    dong_moi.querySelector('.nhap_don_gia').value = '0';
+    than_bang.appendChild(dong_moi);
+    tinh_tong_tien();
+}
+
+function xoa_dong(nut) {
+    var danh_sach_dong = document.querySelectorAll('.dong_san_pham');
+    if (danh_sach_dong.length <= 1) {
+        alert('Phiếu phải có ít nhất 1 dòng sản phẩm.');
+        return;
+    }
+    nut.closest('.dong_san_pham').remove();
+    tinh_tong_tien();
+}
+</script>
+{% endblock %}

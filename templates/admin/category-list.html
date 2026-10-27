@@ -1,0 +1,44 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div class="card">
+    <h2><i class="fa fa-list"></i> Quản lý Danh mục</h2>
+    
+    <div style="margin-bottom: 25px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05);">
+        <form action="{% url 'admin_save_category' %}" method="post" style="display: flex; gap: 15px; align-items: center;">
+            {% csrf_token %}
+            <input type="text" name="name" class="form-control" style="margin-bottom: 0;" placeholder="Nhập tên danh mục mới..." required>
+            <button type="submit" class="btn btn-primary" style="white-space: nowrap;">
+                <i class="fa fa-plus"></i> Thêm danh mục
+            </button>
+        </form>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="10%">ID</th>
+                <th width="60%">Tên danh mục</th>
+                <th width="30%" style="text-align: center;">Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat in categories %}
+            <tr>
+                <td>#{{ cat.id }}</td>
+                <td>{{ cat.name }}</td>
+                <td style="text-align: center;">
+                    <a href="{% url 'admin_delete_category' cat.id %}" class="btn btn-danger" onclick="return confirm('Xóa danh mục này sẽ xóa cả sản phẩm bên trong. Bạn chắc chứ?');">
+                        <i class="fa fa-trash-alt"></i> Xóa
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3" style="text-align: center;">Chưa có danh mục nào.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,276 @@
+{% extends 'admin/layout.html' %}
+{% load static %}
+
+{% block content %}
+<div style="max-width: 1400px; margin: 0 auto;">
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; flex-wrap: wrap; gap: 15px;">
+        <div>
+            <h1 style="font-family: 'Playfair Display', serif; font-size: 2.2rem; margin: 0 0 8px 0; color: #fff; display: flex; align-items: center; gap: 12px;">
+                <i class="fa fa-chart-pie" style="color: #ec4899;"></i> Phân tích Giỏ hàng & Đề xuất Kinh doanh
+            </h1>
+            <p style="color: #9ca3af; margin: 0; font-size: 0.95rem;">
+                Ứng dụng thuật toán khai phá quy tắc kết hợp (Association Rules Mining: <strong>Support</strong>, <strong>Confidence</strong>, <strong>Lift</strong>) nhằm tối ưu doanh thu trung bình trên mỗi đơn hàng (AOV).
+            </p>
+        </div>
+        <div>
+            <span style="background: rgba(236,72,153,0.15); color: #f472b6; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(236,72,153,0.3); display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fa fa-sync-alt fa-spin"></i> Dữ liệu thời gian thực
+            </span>
+        </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="dashboard-stats" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-bottom: 35px;">
+        <!-- Card 1 -->
+        <div class="stat-card" style="background: rgba(31, 41, 55, 0.5); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="stat-icon bg-pink">
+                <i class="fa fa-receipt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ analytics.total_orders }}</h3>
+                <p>Tổng đơn hàng phân tích</p>
+                <small style="color: #6b7280; font-size: 0.78rem;">Tập dữ liệu giỏ hàng thực tế</small>
+            </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="stat-card" style="background: rgba(31, 41, 55, 0.5); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="stat-icon bg-blue">
+                <i class="fa fa-layer-group"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ analytics.multi_item_rate }}%</h3>
+                <p>Tỷ lệ giỏ hàng đa món</p>
+                <small style="color: #60a5fa; font-size: 0.78rem;">{{ analytics.multi_item_orders }} đơn có từ 2 sản phẩm trở lên</small>
+            </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="stat-card" style="background: rgba(31, 41, 55, 0.5); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="stat-icon bg-green">
+                <i class="fa fa-project-diagram"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ analytics.total_rules }}</h3>
+                <p>Quy tắc kết hợp khai phá</p>
+                <small style="color: #34d399; font-size: 0.78rem;">Từ {{ analytics.unique_pairs_count }} cặp sản phẩm tương quan cao</small>
+            </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="stat-card" style="background: rgba(31, 41, 55, 0.5); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #ef4444); box-shadow: 0 4px 15px rgba(245,158,11,0.3);">
+                <i class="fa fa-bolt"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ analytics.top_rule.lift|default:"0" }}x</h3>
+                <p>Lift tương quan cao nhất</p>
+                <small style="color: #fbbf24; font-size: 0.78rem;">Khả năng mua kèm gấp {{ analytics.top_rule.lift|default:"0" }} lần ngẫu nhiên</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Business Strategy Recommendations for Executives -->
+    <div class="card" style="margin-bottom: 35px; border-left: 4px solid #ec4899;">
+        <h2><i class="fa fa-lightbulb"></i> Đề xuất Chiến lược Kinh doanh từ Phân tích Giỏ hàng</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-top: 20px;">
+            {% for rec in analytics.strategic_recommendations %}
+            <div style="background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 22px; position: relative;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <span style="font-size: 1.1rem; color: #ec4899; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa {{ rec.icon }}"></i> {{ rec.title }}
+                    </span>
+                    <span style="background: rgba(236,72,153,0.2); color: #f472b6; font-size: 0.75rem; font-weight: 700; padding: 4px 10px; border-radius: 12px; text-transform: uppercase;">
+                        {{ rec.badge }}
+                    </span>
+                </div>
+                <p style="color: #d1d5db; font-size: 0.92rem; line-height: 1.6; margin: 0;">
+                    {{ rec.content|safe }}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 2 Column Layout: Top Bundle Opportunities & Category Cross-Sell -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 35px;">
+        
+        <!-- Top Combo/Bundling Candidates -->
+        <div class="card" style="margin-bottom: 0;">
+            <h2><i class="fa fa-boxes"></i> Gợi ý Đóng gói Combo (Bundling)</h2>
+            <p style="color: #9ca3af; font-size: 0.88rem; margin-top: -15px; margin-bottom: 20px;">
+                Các cặp sản phẩm có hệ số tương quan Lift & Confidence cao nhất nên đóng combo giảm giá để tăng AOV:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                {% for rule in analytics.bundle_rules %}
+                <div style="background: rgba(17, 24, 39, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
+                        <img src="{{ rule.antecedent.image_url|default:'/static/images/no-image.png' }}?v=2" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <i class="fa fa-plus" style="color: #ec4899; font-size: 0.8rem;"></i>
+                        <img src="{{ rule.consequent.image_url|default:'/static/images/no-image.png' }}?v=2" style="width: 44px; height: 44px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="margin-left: 6px;">
+                            <div style="color: #f3f4f6; font-weight: 600; font-size: 0.88rem; line-height: 1.3;">
+                                {{ rule.antecedent.name|truncatechars:22 }} + {{ rule.consequent.name|truncatechars:22 }}
+                            </div>
+                            <div style="color: #9ca3af; font-size: 0.78rem; margin-top: 2px;">
+                                Khách mua kèm: <strong style="color: #ec4899;">{{ rule.confidence_pct }}%</strong> | Cùng xuất hiện: <strong>{{ rule.pair_count }} đơn</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align: right; margin-left: 10px;">
+                        <span style="background: rgba(16,185,129,0.15); color: #34d399; font-weight: 700; font-size: 0.82rem; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3); display: inline-block;">
+                            Lift: {{ rule.lift }}x
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: #6b7280; font-size: 0.9rem;">Chưa có đủ dữ liệu đơn hàng để phát hiện combo.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Category Cross-selling Distribution -->
+        <div class="card" style="margin-bottom: 0;">
+            <h2><i class="fa fa-network-wired"></i> Mối Liên Kết Danh Mục Chéo</h2>
+            <p style="color: #9ca3af; font-size: 0.88rem; margin-top: -15px; margin-bottom: 20px;">
+                Tần suất khách hàng mua các sản phẩm thuộc 2 danh mục khác nhau trong cùng một đơn hàng:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+                {% for pair in analytics.top_cat_cross %}
+                <div style="background: rgba(17, 24, 39, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 14px 18px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <span style="color: #fff; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
+                            <span style="background: rgba(236,72,153,0.15); color: #ec4899; padding: 3px 8px; border-radius: 6px; font-size: 0.8rem;">{{ pair.cat_a }}</span>
+                            <i class="fa fa-arrows-alt-h" style="color: #6b7280;"></i>
+                            <span style="background: rgba(139,92,246,0.15); color: #a78bfa; padding: 3px 8px; border-radius: 6px; font-size: 0.8rem;">{{ pair.cat_b }}</span>
+                        </span>
+                        <span style="color: #ec4899; font-weight: 700; font-size: 0.85rem;">{{ pair.count }} quy tắc</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
+                        <div style="height: 100%; background: linear-gradient(90deg, #ec4899, #8b5cf6); width: {% widthratio pair.count 20 100 %}%;"></div>
+                    </div>
+                </div>
+                {% empty %}
+                <p style="color: #6b7280; font-size: 0.9rem;">Chưa có dữ liệu danh mục chéo.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Association Rules Mining Table -->
+    <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+            <div>
+                <h2><i class="fa fa-table"></i> Bảng Quy Tắc Kết Hợp (Association Rules)</h2>
+                <p style="color: #9ca3af; font-size: 0.88rem; margin: -15px 0 0 0;">
+                    Quy tắc hướng: <strong>Nếu mua Antecedent (A) &rarr; Sẽ mua Consequent (B)</strong> với chỉ số Support, Confidence và Lift.
+                </p>
+            </div>
+            <!-- Metrics Explanation Tooltip / Legend -->
+            <div style="display: flex; gap: 15px; font-size: 0.8rem; color: #9ca3af;">
+                <span><strong style="color: #60a5fa;">Support:</strong> Độ phổ biến (% đơn có cả A & B)</span>
+                <span><strong style="color: #ec4899;">Confidence:</strong> Xác suất mua B khi đã có A</span>
+                <span><strong style="color: #34d399;">Lift:</strong> Sức mạnh tương quan (> 1.0)</span>
+            </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Sản phẩm gốc (A)</th>
+                        <th style="width: 25%;">Sản phẩm mua kèm (B)</th>
+                        <th style="text-align: center;">Tần suất</th>
+                        <th style="text-align: center;">Support</th>
+                        <th style="text-align: center;">Confidence</th>
+                        <th style="text-align: center;">Lift</th>
+                        <th style="text-align: center;">Chiến lược</th>
+                        <th>Hành động đề xuất</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rule in analytics.rules %}
+                    <tr>
+                        <!-- Antecedent -->
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="{{ rule.antecedent.image_url|default:'/static/images/no-image.png' }}?v=2" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+                                <div>
+                                    <div style="color: #fff; font-weight: 500; font-size: 0.88rem; line-height: 1.3;">{{ rule.antecedent.name }}</div>
+                                    <small style="color: #9ca3af; font-size: 0.75rem;">{{ rule.antecedent.price|currency }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Consequent -->
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="{{ rule.consequent.image_url|default:'/static/images/no-image.png' }}?v=2" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; flex-shrink: 0;">
+                                <div>
+                                    <div style="color: #fff; font-weight: 500; font-size: 0.88rem; line-height: 1.3;">{{ rule.consequent.name }}</div>
+                                    <small style="color: #9ca3af; font-size: 0.75rem;">{{ rule.consequent.price|currency }}</small>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Frequency -->
+                        <td style="text-align: center; color: #d1d5db; font-weight: 600;">
+                            {{ rule.pair_count }} đơn
+                        </td>
+
+                        <!-- Support -->
+                        <td style="text-align: center;">
+                            <span style="color: #60a5fa; font-weight: 600;">{{ rule.support_pct }}%</span>
+                        </td>
+
+                        <!-- Confidence -->
+                        <td style="text-align: center;">
+                            <span style="background: rgba(236,72,153,0.15); color: #ec4899; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.85rem;">
+                                {{ rule.confidence_pct }}%
+                            </span>
+                        </td>
+
+                        <!-- Lift -->
+                        <td style="text-align: center;">
+                            <span style="background: rgba(16,185,129,0.15); color: #34d399; padding: 4px 8px; border-radius: 6px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(16,185,129,0.3);">
+                                {{ rule.lift }}x
+                            </span>
+                        </td>
+
+                        <!-- Strategy Tag -->
+                        <td style="text-align: center;">
+                            {% if rule.strategy_type == 'COMBO_BUNDLE' %}
+                            <span style="background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid rgba(239,68,68,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+                                <i class="fa fa-box-open mr-1"></i> Combo Bundle
+                            </span>
+                            {% elif rule.strategy_type == 'CROSS_SELL' %}
+                            <span style="background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid rgba(16,185,129,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+                                <i class="fa fa-shopping-bag mr-1"></i> Cross-Sell
+                            </span>
+                            {% else %}
+                            <span style="background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid rgba(59,130,246,0.4); padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; white-space: nowrap;">
+                                <i class="fa fa-th-large mr-1"></i> Trưng bày cùng
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Strategy Description -->
+                        <td style="color: #9ca3af; font-size: 0.82rem; line-height: 1.4;">
+                            {{ rule.strategy_desc }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Chưa có dữ liệu quy tắc giỏ hàng.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'admin/layout.html' %}
+
+{% block content %}
+<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background-color: #f8f9fa;">
+    
+    <!-- Thanh điều hướng phụ -->
+    <div style="margin-bottom: 20px;">
+        <a href="{% url 'admin_orders' %}" style="text-decoration: none; color: #6c757d; font-size: 14px;">
+            <i class="fas fa-chevron-left"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    <div style="background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; border: 1px solid #eee;">
+        <!-- Header đơn hàng -->
+        <div style="padding: 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+            <h2 style="margin: 0; font-size: 24px; color: #333; font-weight: 600;">
+                <i class="fas fa-file-invoice" style="color: #e91e63; margin-right: 10px;"></i>
+                Chi tiết đơn hàng #<span>{{ order.id }}</span>
+            </h2>
+            <span style="background: #fff3cd; color: #856404; padding: 6px 15px; border-radius: 20px; font-size: 13px; font-weight: bold;">
+                {{ order.status }}
+            </span>
+        </div>
+
+        <div style="padding: 30px;">
+            <!-- Khu vực thông tin -->
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; margin-bottom: 40px;">
+                
+                <!-- Cột bên trái: Giao hàng -->
+                <div style="background: #fff9fa; border: 1px dashed #ffc1d6; padding: 20px; border-radius: 10px;">
+                    <h4 style="color: #d81b60; margin-top: 0; margin-bottom: 15px; font-size: 18px;">
+                        <i class="fas fa-truck" style="margin-right: 8px;"></i> Thông tin giao hàng
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 120px 1fr; gap: 10px; line-height: 1.6;">
+                        <span style="color: #666;">Người nhận:</span>
+                        <strong>{{ order.receiver_name }}</strong>
+                        <span style="color: #666;">Điện thoại:</span>
+                        <span>{{ order.receiver_phone }}</span>
+                        <span style="color: #666;">Địa chỉ:</span>
+                        <span>{{ order.shipping_address }}</span>
+                    </div>
+                </div>
+
+                <!-- Cột bên phải: Cập nhật -->
+                <div style="background: #fdfdfd; border: 1px solid #eee; padding: 20px; border-radius: 10px;">
+                    <h4 style="margin-top: 0; margin-bottom: 15px; font-size: 18px;">Cập nhật trạng thái</h4>
+                    <form action="{% url 'admin_update_order_status' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="orderId" value="{{ order.id }}">
+                        <div style="display: flex; gap: 10px;">
+                            <select name="status" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ddd; outline: none;">
+                                <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Chờ xử lý</option>
+                                <option value="PROCESSING" {% if order.status == 'PROCESSING' %}selected{% endif %}>Đang xử lý</option>
+                                <option value="SHIPPED" {% if order.status == 'SHIPPED' %}selected{% endif %}>Đang giao hàng</option>
+                                <option value="DELIVERED" {% if order.status == 'DELIVERED' %}selected{% endif %}>Đã giao hàng</option>
+                                <option value="CANCELLED" {% if order.status == 'CANCELLED' %}selected{% endif %}>Đã hủy</option>
+                            </select>
+                            <button type="submit" style="background: #e91e63; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                Lưu
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Bảng sản phẩm -->
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee; text-align: left;">
+                        <th style="padding: 15px 10px; color: #888; font-size: 13px;">SẢN PHẨM</th>
+                        <th style="padding: 15px 10px; color: #888; font-size: 13px; text-align: center;">SỐ LƯỢNG</th>
+                        <th style="padding: 15px 10px; color: #888; font-size: 13px; text-align: right;">ĐƠN GIÁ</th>
+                        <th style="padding: 15px 10px; color: #888; font-size: 13px; text-align: right;">THÀNH TIỀN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.order_items.all %}
+                    <tr style="border-bottom: 1px solid #fafafa;">
+                        <td style="padding: 15px 10px;">
+                            <div style="display: flex; align-items: center;">
+                                <div style="width: 40px; height: 40px; background: #f0f0f0; border-radius: 4px; margin-right: 12px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fas fa-box" style="color: #ccc;"></i>
+                                </div>
+                                <span style="font-weight: 600; color: #333;">{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td style="padding: 15px 10px; text-align: center;">{{ item.quantity }}</td>
+                        <td style="padding: 15px 10px; text-align: right;">{{ item.price_at_order|currency }}</td>
+                        <td style="padding: 15px 10px; text-align: right; color: #e91e63; font-weight: bold;">
+                            {{ item.get_total_price|currency }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Tổng thanh toán -->
+            <div style="display: flex; justify-content: flex-end;">
+                <div style="background: #fff5f8; padding: 25px; border-radius: 12px; min-width: 280px; text-align: right;">
+                    <span style="color: #666; font-size: 14px;">Tổng cộng tiền hàng</span>
+                    <div style="color: #e91e63; font-size: 28px; font-weight: 800; margin: 5px 0;">
+                        {{ order.total_amount|currency }}
+                    </div>
+                    <span style="color: #999; font-size: 12px; font-style: italic;">(Đã bao gồm VAT nếu có)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

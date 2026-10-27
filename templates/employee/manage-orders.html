@@ -1,0 +1,59 @@
+{% extends 'employee/layout.html' %}
+{% block content %}
+<div class="card">
+    <h2><i class="fa fa-shopping-cart"></i> Quản Lý Đơn Hàng (Chưa Giao)</h2>
+    
+    {% if not orders %}
+        <p style="text-align: center; color: #888; padding: 30px;">Không có đơn hàng nào cần xử lý.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã ĐH</th>
+                    <th>Khách hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Cập nhật</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td>#{{ o.id }}</td>
+                    <td>
+                        <strong>{{ o.receiver_name }}</strong><br>
+                        <small>{{ o.receiver_phone }}</small><br>
+                        <small style="color: #666;">{{ o.shipping_address }}</small>
+                    </td>
+                    <td>{{ o.order_date|date:"d/m/Y H:i" }}</td>
+                    <td style="color: #e91e63; font-weight: bold;">{{ o.total_amount|floatformat:"0" }} đ</td>
+                    <td>
+                        {% if o.status == 'PENDING' %}
+                            <span style="background: #ffc107; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Đang chờ</span>
+                        {% elif o.status == 'PROCESSING' %}
+                            <span style="background: #17a2b8; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Đang xử lý</span>
+                        {% elif o.status == 'SHIPPED' %}
+                            <span style="background: #007bff; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">Đang giao</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'employee_update_order' %}" method="post" style="display: flex; gap: 5px;">
+                            {% csrf_token %}
+                            <input type="hidden" name="orderId" value="{{ o.id }}">
+                            <select name="status" class="form-control" style="padding: 4px; width: 120px;" required>
+                                <option value="PENDING" {% if o.status == 'PENDING' %}selected{% endif %}>Đang chờ</option>
+                                <option value="PROCESSING" {% if o.status == 'PROCESSING' %}selected{% endif %}>Đang xử lý</option>
+                                <option value="SHIPPED" {% if o.status == 'SHIPPED' %}selected{% endif %}>Đang giao</option>
+                                <option value="DELIVERED" {% if o.status == 'DELIVERED' %}selected{% endif %}>Đã giao xong</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary" style="padding: 4px 8px; font-size: 12px;">Lưu</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}

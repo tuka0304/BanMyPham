@@ -1,0 +1,119 @@
+{% extends khung_giao_dien %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; color: #fff; margin: 0; display: flex; align-items: center; gap: 12px;">
+            <i class="fa fa-truck-loading" style="color: #ec4899;"></i> Danh Sách Nhà Cung Cấp
+        </h2>
+        <p style="color: #9ca3af; margin: 5px 0 0 0; font-size: 0.95rem;">Quản lý thông tin các nhà cung cấp mỹ phẩm và đối tác phân phối.</p>
+    </div>
+    <a href="{% url 'tao_phieu_kho' %}" class="btn btn-primary">
+        <i class="fa fa-plus-circle"></i> Nhập Kho Từ NCC
+    </a>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 360px; gap: 25px;">
+    <div>
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="padding-left: 25px;">NHÀ CUNG CẤP</th>
+                        <th>NGƯỜI LIÊN HỆ</th>
+                        <th>LIÊN HỆ (SĐT / EMAIL)</th>
+                        <th>ĐỊA CHỈ</th>
+                        <th style="text-align: center; padding-right: 25px;">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ncc in danh_sach_nha_cung_cap %}
+                    <tr>
+                        <td style="padding-left: 25px;">
+                            <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">{{ ncc.ten_nha_cung_cap }}</div>
+                            <small style="color: #6b7280;">Mã NCC: #{{ ncc.id }}</small>
+                        </td>
+                        <td style="color: #e5e7eb;">
+                            <i class="fa fa-user-circle" style="color: #60a5fa; margin-right: 4px;"></i> {{ ncc.nguoi_lien_he|default:"Đại diện NCC" }}
+                        </td>
+                        <td>
+                            {% if ncc.so_dien_thoai %}
+                            <div style="color: #34d399; font-weight: 600; font-size: 0.9rem;">
+                                <i class="fa fa-phone-alt" style="font-size: 0.8rem; margin-right: 4px;"></i> {{ ncc.so_dien_thoai }}
+                            </div>
+                            {% endif %}
+                            {% if ncc.email %}
+                            <div style="color: #9ca3af; font-size: 0.85rem; margin-top: 2px;">
+                                <i class="fa fa-envelope" style="font-size: 0.8rem; margin-right: 4px;"></i> {{ ncc.email }}
+                            </div>
+                            {% endif %}
+                            {% if not ncc.so_dien_thoai and not ncc.email %}
+                            <span style="color: #6b7280;">-</span>
+                            {% endif %}
+                        </td>
+                        <td style="color: #d1d5db; max-width: 200px;">
+                            {{ ncc.dia_chi|default:"Chưa cập nhật" }}
+                        </td>
+                        <td style="text-align: center; padding-right: 25px;">
+                            {% if request.user.role == 'ADMIN' %}
+                            <a href="{% url 'xoa_nha_cung_cap' ncc.id %}" class="btn btn-danger" style="padding: 6px 12px; font-size: 0.85rem;" onclick="return confirm('Bạn có chắc muốn xóa nhà cung cấp này?')">
+                                <i class="fa fa-trash"></i> Xóa
+                            </a>
+                            {% else %}
+                            <span style="color: #6b7280; font-size: 0.85rem;">Chỉ xem</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: #9ca3af;">
+                            Chưa có nhà cung cấp nào. Vui lòng thêm mới bên cạnh!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <div class="card">
+            <h3 style="color: #fff; font-size: 1.2rem; margin-top: 0; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-plus-circle" style="color: #ec4899;"></i> Thêm Nhà Cung Cấp
+            </h3>
+
+            <form method="post" action="{% url 'them_nha_cung_cap' %}">
+                {% csrf_token %}
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Tên nhà cung cấp *</label>
+                    <input type="text" name="ten_nha_cung_cap" required placeholder="Ví dụ: Công ty Phân Phối Mỹ Phẩm L'Oreal" style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Người liên hệ</label>
+                    <input type="text" name="nguoi_lien_he" placeholder="Họ tên người liên hệ..." style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Số điện thoại</label>
+                    <input type="text" name="so_dien_thoai" placeholder="0912345678" style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Email</label>
+                    <input type="email" name="email" placeholder="contact@supplier.vn" style="margin-bottom: 0;">
+                </div>
+
+                <div style="margin-bottom: 22px;">
+                    <label style="color: #d1d5db; font-size: 0.9rem; font-weight: 600;">Địa chỉ</label>
+                    <textarea name="dia_chi" rows="2" placeholder="Địa chỉ nhà cung cấp..." style="margin-bottom: 0;"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 700; border-radius: 10px;">
+                    <i class="fa fa-check"></i> Lưu Nhà Cung Cấp
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

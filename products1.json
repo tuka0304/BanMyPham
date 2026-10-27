@@ -1,0 +1,316 @@
+[
+    {
+        "name": "Sữa Rửa Mặt CeraVe Sạch Sâu Cho Da Thường Đến Da Dầu 473ml",
+        "category_name": "Chăm sóc da mặt",
+        "description": "Sữa Rửa Mặt Cerave Sạch Sâu là sản phẩm sữa rửa mặt đến từ thương hiệu mỹ phẩm Cerave của Mỹ, với sự kết hợp của ba Ceramides thiết yếu, Hyaluronic Acid sản phẩm giúp làm sạch và giữ ẩm cho làn da mà không ảnh hưởng đến hàng rào bảo vệ da mặt và cơ thể.",
+        "price": 348000,
+        "stock_quantity": 50,
+        "image_file": "srm_cerave.jpg",
+        "source_image": "images/srm_cerave.jpg"
+    },
+    {
+        "name": "Kem Dưỡng La Roche-Posay Giúp Phục Hồi Da Đa Công Dụng 40ml",
+        "category_name": " Chăm sóc da mặt ",
+        "description": "Kem Dưỡng La Roche-Posay Giúp Phục Hồi Da Đa Công Dụng là sản phẩm kem dưỡng đến từ thương hiệu dược mỹ phẩm La Roche-Posay được thiết kế chuyên biệt dành cho làn da khô, kích ứng và thương tổn, giúp phục hồi da sau 1H và bảo vệ hàng rào độ ẩm da với công nghệ cải tiến mới Tribioma và các hoạt chất phục hồi chuyên sâu.",
+        "price": 301000,
+        "stock_quantity": 100,
+        "image_file": "kem-duong-la-roche-posay.jpg",
+        "source_image": " images/kem-duong-la-roche-posay.jpg "
+    },
+    {
+        "name": "Serum La Roche-Posay Hyalu B5 Cấp Ẩm Phục Hồi Da 10ml",
+        "category_name": "Chăm sóc da mặt",
+        "description": "Serum La Roche-Posay Hyalu B5 là tinh chất dưỡng da thuộc dòng Hyalu B5, hướng đến nhu cầu cấp ẩm, làm dịu và hỗ trợ chăm sóc hàng rào bảo vệ da. Công thức nổi bật với Hyaluronic Acid, Vitamin B5 và Madecassoside, phù hợp bổ sung vào chu trình skincare hằng ngày cho làn da thiếu ẩm, khô căng hoặc cần được chăm sóc phục hồi.",
+        "stock_quantity": 178000,
+        "image_file": "serum-la-roche-posay.jpg",
+        "source_image": " images/serum-la-roche-posay.jpg "
+    },
+    {
+        "name": "[HỘP 10 MIẾNG]Mặt Nạ Giấy Caryophy Portulaca Mask Sheet Rau Má Rau Sam Cấp Ẩm Làm Dịu Da",
+        "category_name": "Chăm sóc da mặt",
+        "description": "Mặt nạ giấy Caryophy Portulaca là sản phẩm mặt nạ giấy đến từ thương hiệu Caryophy, chứa chiết xuất rau má và rau sam, giúp cấp ẩm sâu, làm dịu da và giảm viêm.",
+        "price": 280000,
+        "stock_quantity": 120,
+        "image_file": "mat-na-giay-caryophy.jpg",
+        "source_image": "images/mat-na-giay-caryophy.jpg"
+    },
+    {
+        "name": "Mặt nạ nghệ Hưng Yên cocoon 30ml (Turmeric face mask) đều màu, giảm thâm - VEGAN - thuần chay",
+        "category_name": "Chăm sóc da mặt",
+        "description": " Mặt nạ nghệ Hưng Yên cocoon (Turmeric face mask) chiết xuất từ tinh bột nghệ giàu Curcuminoid kết hợp với Vitamin B3 và chiết xuất yến mạch rất phù hợp với cho làn da xỉn màu và có nhiều vết thâm. sau khi rửa đi lớp mặt nạ, bạn sẻ nhìn thấy một làn da tươi mới, tươi tắn và đều màu hơn.",
+        "price": 136000,
+        "stock_quantity": 100,
+        "image_file": "mat-na-nghe-cocoon.jpg",
+        "source_image": "images/mat-na-nghe-cocoon.jpg"
+    },
+    {
+        "name": "Sữa Dưỡng Thể Trắng Da Body Vaseline Gluta-Hya bản hồng Hiệu Quả Sau 7 Ngày 300ml",
+        "category_name": "Chăm sóc cơ thể",
+        "description": "Sữa Dưỡng Thể Trắng Da Body Vaseline Gluta-hya Hiệu Quả Sau 7 Ngày 330ml Vaseline Tin Rằng Bất Cứ Ai Cũng Xứng Đáng Sở Hữu Một Làn Da Khỏe Mạnh. Với Hơn 150 Năm Kinh Nghiệm Nghiên Cứu, Vaseline Giới Thiệu Gluta-hya Serum Burst Uv Lotion Flawless Bright Dưỡng Sáng Không Lo Tì Vết, Giúp Cải Thiện Làn Không Đều Màu Và Có Đốm Nâu.",
+        "price": 208000,
+        "stock_quantity": 100,
+        "image_file": "duong-the-vaseline.jpg",
+        "source_image": "images/duong-the-vaseline.jpg"
+    },
+    {
+        "name": "Dầu Gội Loreal Elseve Hyaluron Pure 72H Purifying Shampoo 400ml",
+        "category_name": "Chăm sóc tóc và da đầu",
+        "description": "Dầu Gội & Xả L'OREAL Elseve Hyaluron 72H mang đến khả năng cấp ẩm vượt trội cho tóc khô xơ, giúp tóc mềm mượt, bóng khỏe và phục hồi hiệu quả chỉ sau vài lần sử dụng. Công thức chứa Hyaluronic Acid kết hợp cùng các thành phần dưỡng chất giúp khóa ẩm, nuôi dưỡng tóc từ gốc đến ngọn, đồng thời làm sạch da đầu, loại bỏ dầu thừa và bụi bẩn, mang lại mái tóc bồng bềnh, dễ chải và không bết dính.",
+        "price": 189000,
+        "stock_quantity": 100,
+        "image_file": "dau-goi-elseve.jpg",
+        "source_image": "images/dau-goi-elseve.jpg"
+    },
+    {
+        "name": "CHÍNH HÃNG ĐỘC QUYỀN] Tẩy Tế Bào Chết Body Dove Chăm Da Sáng Mịn 280G",
+        "category_name": "Chăm sóc cơ thể",
+        "description": "Tẩy Tế Bào Chết Body Dove Chăm Da Sáng Mịn 280G là sản phẩm tẩy tế bào chết đến từ thương hiệu Dove, giúp loại bỏ tế bào chết trên da, làm sáng và mịn màng làn da cơ thể.",
+        "price": 187000,
+        "stock_quantity": 100,
+        "image_file": "tay-te-bao-chet-dove.jpg",
+        "source_image": "images/tay-te-bao-chet-dove.jpg"
+
+    },
+    {
+        "name": "Kem Ủ Dove Ceramide Phục Hồi Hư Tổn | Ngăn Ngừa Gãy Rụng - Hũ 300ML",
+        "category_name": "Chăm sóc tóc và da đầu",
+        "description": "DOVE MỚI - CÔNG THỨC CẢI TIẾN, PHỤC HỒI HƯ TỔN VƯỢT TRỘI Với hơn 10 năm nghiên cứu cùng 2 công nghệ độc quyền, Dove giới thiệu Kem xả Serum Ceramide Phục hồi hư tổn và Biotin Ngăn gãy rụng mới.Công thức được cải tiến với BIO-PROTEIN CARE™, kết hợp cùng Glutamic Amino Serum - một Amino Acid tự nhiên trong tóc, giúp phục hồi và bảo vệ cấu trúc tóc từ bên trong, cho tóc trông như được tái sinh chắc khỏe gấp 10 lần*.",
+        "price": 178000,
+        "stock_quantity": 100,
+        "image_file": "kem-u-dove.jpg",
+        "source_image": "images/kem-u-dove.jpg"
+    },
+    {
+        "name": "(CHÍNH HÃNG) BODY OIL Dầu dưỡng da toàn thân,hỗ trợ dưỡng sáng,cấp ẩm,hỗ trợ da sần sùi,da bị viêm lỗ chân lông,CAMIORÉ",
+        "category_name": "Chăm sóc cơ thể",
+        "description": "BODY OIL Dầu dưỡng da toàn thân,hỗ trợ dưỡng sáng,cấp ẩm,hỗ trợ da sần sùi,da bị viêm lỗ chân lông,CAMIORÉ là sản phẩm dầu dưỡng da đến từ thương hiệu CAMIORÉ, giúp cấp ẩm sâu, làm sáng và cải thiện làn da cơ thể.",
+        "price": 134000,
+        "stock_quantity": 100,
+        "image_file": "body-oil.jpg",
+        "source_image": "images/body-oil.jpg"
+    },
+    {
+        "name": "Son Thỏi Lì Matte Flower Knows Bunny Garden Collection Kem dưỡng môi Nhung Mềm Môi Lâu Trôi Không Khô Môi 5ml",
+        "category_name": "Trang điểm",
+        "description": "Son Thỏi Lì Matte Flower Knows Bunny Garden Collection là sản phẩm son môi đến từ thương hiệu Flower Knows, với chất son lì, mềm mượt và lâu trôi, giúp đôi môi trở nên quyến rũ và căng mọng.",
+        "price": 380000,
+        "stock_quantity": 60,
+        "image_file": "son-b05-bunny-garden.jpg",
+        "source_image": "images/son-b05-bunny-garden.jpg"
+    },
+    {
+        "name": "FOCALLURE Watery Velvet Tint Smooth Kết cấu nhẹ Lợi ích dưỡng ẩm Son môi lâu trôi",
+        "category_name": "Trang điểm",
+        "description": "FOCALLURE Watery Velvet Tint Smooth là sản phẩm son môi đến từ thương hiệu FOCALLURE, với kết cấu nhẹ, mang lại cảm giác dễ chịu và lợi ích dưỡng ẩm cho đôi môi.", 
+        "price": 123000,
+        "stock_quantity": 80,
+        "image_file": "son-focallure.jpg",
+        "source_image": "images/son-focallure.jpg"
+    },
+    {
+        "name": "Son YSL Rouge Pur Couture The Bold 1971 10 06 Auth Màu Đỏ Đất Siêu Xinh Độ Lì Tốt Mềm Mịn Mỏng Nhẹ fullbox MỘC MỘC",
+        "category_name": "Trang điểm",
+        "description": "Son Rouge Pur Couture The Bold 1971 Auth Màu Đỏ Đất SiêuXinh Độ Lì Tốt Mềm Mịn Mỏng Nhẹ Cực Kì Tôn Da Ưu đãi duy nhất ngày hôm nay, nhận ngay mã giảm giá lớn khi mua hàng, nhắn tin shop ngay để được hỗ trợ.",
+        "price": 604000,
+        "stock_quantity": 50,
+        "image_file": "son-ysl.jpg",
+        "source_image": "images/son-ysl.jpg"
+    },
+    {
+        "name": "(CHÍNH HÃNG) Son Môi Lâu Phai Revlon ColorStay Suede Ink Mịn Lì Như Nhung (2.55g)",
+        "category_name": "Trang điểm",
+        "description": "Son Môi Lâu Phai Revlon ColorStay Suede Ink Mịn Lì Như Nhung giữ màu lâu và mang lại cảm giác mịn màng cho đôi môi.",
+        "price": 278000,
+        "stock_quantity": 80,
+        "image_file": "son-colostay-revlon.jpg",
+        "source_image": "images/son-colostay-revlon.jpg"
+    },
+    {
+        "name": "Son Bóng Dưỡng Môi Mọng Ẩm Mềm Xinh, Nhẹ Môi Không Dính, Màu Trong Trẻo SUGARPLUM Delish Lip Oil (3.4g)",
+        "category_name": "Trang điểm",
+        "description": "Son Bóng Dưỡng Môi Mọng Ẩm Mềm Xinh, Nhẹ Môi Không Dính, Màu Trong Trẻo SUGARPLUM Delish Lip Oil (3.4g)",
+        "price": 188000,
+        "image_file": "son-o.jpg",
+        "source_image": "images/son-o.jpg"
+    },
+    {
+        "name": "Son Dr Addict Lip Maximizer Gloss 6ml Chất Son Bóng Mịn, Dễ Sử Dụng Hằng Ngày",
+        "category_name": "Trang điểm",
+        "description": "Son bóng dưỡng môi với kết cấu nhẹ nhàng, tạo hiệu ứng môi bóng mịn tự nhiên.Thiết kế nhỏ gọn, dễ sử dụng hằng ngày và phù hợp kết hợp cùng nhiều phong cách makeup.",
+        "price": 650000,
+        "stock_quantity": 80,
+        "image_file": "son-dior.jpg",
+        "source_image": "images/son-dior.jpg"
+    },
+    {
+        "name": "Kem nền đệm Flower Knows Bunny Garden Collection Foundation hiểm toàn diện Kem nền không tì vết không móng vuốt Matte Oil-Control Longwear 16g",
+        "category_name": "Trang điểm",
+        "description": "Kem nền kem nền Flower Knows Bunny Garden Collection Thoáng khí, Giữ cả ngày.Ứng dụng một lần nhấn để có một kết thúc lâu dài, không bong tróc Mềm mại và dẻo dai, sẽ không làm tắc nghẽn lỗ chân lông bốn lớp dầu dưỡng ẩm",
+        "price": 479000,
+        "stock_quantity": 100,
+        "image_file": "cursion-ribon.jpg",
+        "source_image": "images/cursion-ribon.jpg"
+    },
+    {
+        "name": "Phấn Phủ Nén Flower Knows Strawberry Cupid Bộ Sưu Tập Thiết Lập, Che Khuyết Điểm & Hoàn Thiện Lấy Nét Mềm 9,5g",
+        "category_name": "Trang điểm",
+        "description": "Bột ép bộ sưu tập Cupid Flower Knows dâu tây một lớp sương ngọt ngào để che phủ hoàn hảo, lâu dài Kết cấu bột mềm mại và tinh tế được tăng cường bởi công nghệ luồng không khí micropowder, bột cung cấp một kết cấu siêu mịn, nhất quán để có một kết thúc mờ hoàn hảo.",
+        "price": 415000,
+        "stock_quantity": 100,
+        "image_file": "phan-phu-hoabiec.jpg",
+        "source_image": "images/phan-phu-hoabiec.jpg"
+    },
+    {
+        "name": "[CHÍNH HÃNG] Phấn Nước YSL All Hours Blur Mattifying Icy Cushion Cho Hiệu Ứng Mịn Mờ, Kiềm Dầu & Mát Lạnh Thư Giãn 14g",
+        "category_name": "Trang điểm",
+        "description": "YSL All Hours Blur Cushion là kiểu phấn nước rất dễ tạo thiện cảm ngay từ lần đầu sử dụng: lớp nền mịn mờ, cảm giác mát nhẹ, bề mặt da trông gọn hơn và tổng thể gương mặt trở nên chỉn chu theo cách rất hiện đại. Điểm đáng giá của sản phẩm không chỉ nằm ở hiệu ứng thị giác, mà còn ở cảm giác dùng đủ thoải mái để phù hợp với nhịp sống hằng ngày.",
+        "price": 2352000,
+        "stock_quantity": 100,
+        "image_file": "kem-nen-ysl.jpg",
+        "source_image": "images/kem-nen-ysl.jpg"
+    },
+    {
+        "name": "MASCARA BROWIT NONGCHAT THÁI LAN - DATE 2028",
+        "category_name": "Trang điểm",
+        "description": "MASCARA BROWIT NONGCHAT THÁI LAN - Giúp bạn gái sở hữu làn mi dày dặn, cong vút tự nhiên trong suốt 24 giờ.",
+        "price": 84000,
+        "stock_quantity": 100,
+        "image_file": "mascara-browit.jpg",
+        "source_image": "images/mascara-browit.jpg"
+    },
+    {
+        "name": "[HOT] MI GIẢ IDOL ACE ELYZZA Lông Mi Giả Tự Nhiên, 10-12mm Mi Tách Sợi, Mi Cụm Mềm Mại Và Dễ Sử Dụng, Mi Giả Cụm Ăn Ảnh, Mi Chùm 3 Cụm, Sợi Mi Có Thể Sử Dụng Được Nhiều Lần",
+        "category_name": "Trang điểm",
+        "description": "ELYZZA Mi Dưới Genki Comics. Tự tin thể hiện cá nhân của bạn và thế hiện vẻ đẹp hoàn hảo! Mi Dưới tự nhiên và lông mi đẹp, 5-6mm mi giả tách sợi, mi cụm tự dính, mi đẹp dễ dán, mi giả cụm ăn ảnh, Mi Gia Chùm 3 Cụm, mi sợi có thể sử dụng được nhiều lần.",
+        "price": 114000,
+        "stock_quantity": 60,
+        "image_file": "mi-gia-idol.jpg",
+        "source_image": "images/mi-gia-idol.jpg"
+    },
+    {
+        "name": "Lông Mi Giả Butterfly Fairy ELYZZA Sợi Mi 9-11mm Độ Cong LC, Mi Cụm Mềm Mại Tạo Hiệu Ứng Mắt To Tự Nhiên, Phù hợp cả mắt Sụp Mí & Mắt Một Mí/Mí Lót",
+        "category_name": "Trang điểm",
+        "description": "ELYZZA Mi Dưới Genki Comics. Tự tin thể hiện cá nhân của bạn và thế hiện vẻ đẹp hoàn hảo! Mi Dưới tự nhiên và lông mi đẹp, 5-6mm mi giả tách sợi, mi cụm tự dính, mi đẹp dễ dán, mi giả cụm ăn ảnh, Mi Gia Chùm 3 Cụm, mi sợi có thể sử dụng được nhiều lần.",
+        "price": 48000,
+        "stock_quantity": 70,
+        "image_file": "mi-gia-butterfly.jpg",
+        "source_image": "images/mi-gia-butterfly.jpg"
+    },
+    {
+        "name": "[MỚI] Bút Chì Kẻ Viền Môi PinkPunk màu 01- Hồng Nude 4 in 1 kẻ Bọng Mắt Mở Góc Mắt Tạo Khối Mũi Sáp Kết Cấu Căng Mọng 0.25g",
+        "category_name": "Trang điểm",
+        "description": "Bút Kẻ Viền Môi Đa Năng - 3 Trong 1 đa công dụng: Chỉ với một cây bút, bạn có thể kẻ viền môi, tạo hiệu ứng bọng mắt (mắt cười) và đánh khối mũi, giúp khuôn mặt bạn trở nên cân đối và tự nhiên hơn.",
+        "price": 90000,
+        "stock_quantity": 100,
+        "image_file": "ke-moi-pinkpunk-01.jpg",
+        "source_image": "images/ke-moi-pinkpunk-01.jpg"
+    },
+    {
+        "name": "[MỚI] Bút Chì Kẻ Viền Môi PinkPunk màu 03- Nâu Nude 4 in 1 kẻ Bọng Mắt Mở Góc Mắt Tạo Khối Mũi Sáp Kết Cấu Căng Mọng 0.25g",
+        "category_name": "Trang điểm",
+        "description": "Bút Kẻ Viền Môi Đa Năng - 3 Trong 1 đa công dụng: Chỉ với một cây bút, bạn có thể kẻ viền môi, tạo hiệu ứng bọng mắt (mắt cười) và đánh khối mũi, giúp khuôn mặt bạn trở nên cân đối và tự nhiên hơn.",
+        "price": 900000,
+        "stock_quantity": 100,
+        "image_file": "ke-moi-pinkpunk-03.jpg",
+        "source_image": "images/ke-moi-pinkpunk-03.jpg"
+    },
+    {
+        "name": "03 Ballet Tutu Phấn Má Hồng Flower Knows Bunny Garden bộ sưu tập Blush Sáng Tự Nhiên Xả Lâu Dài Mềm 5g",
+        "category_name": "Trang điểm",
+        "description": "Bộ sưu tập Vườn thỏ Hoa Knows Phấn má hồng nổi Hộp Ngọc Trai Mơ, Má Sáng Mềm Mại Và Rạng Rỡ Nghề thủ công bằng ngọc trai giống ngọc trai Tái tạo kết cấu tinh tế của men tráng men.",
+        "price": 353000,
+        "stock_quantity": 50,
+        "image_file": "ma-hong-03-ballet.jpg",
+        "source_image": "images/ma-hong-03-ballet.jpg"
+    },
+    {
+        "name": "Tinh dầu nước hoa Lilith and Eve Daisy Eau De Parfum 30ml nữ thơm lâu lưu hương lâu cho body 5h",
+        "category_name": "Nước hoa",
+        "description": "Tinh dầu nước hoa Lilith and Eve Daisy Eau De Parfum 30ml - Hương thơm lâu dài, an toàn cho da nhạy cảm, mang lại cảm giác dễ chịu và quyến rũ.",
+        "price": 170000,
+        "stock_quantity": 100,
+        "image_file": "nuoc-hoa-lilith.jpg",
+        "source_image": "images/nuoc-hoa-lilith.jpg"
+    },
+    {
+        "name": "Nước Hoa Nữ CINDY BLOOM Aroma Flower Hương Ngọt Ngào Nữ Tính 50ml/chai",
+        "category_name": "Nước hoa",
+        "description": "Nước hoa nữ CINDY BLOOM Aroma Flower mang đến hương thơm ngọt ngào, nữ tính và quyến rũ, giúp bạn tự tin và tỏa sáng suốt cả ngày dài.",
+        "price": 210000,
+        "stock_quantity": 100,
+        "image_file": "nuoc-hoa-bloom.jpg",
+        "source_image": "images/nuoc-hoa-bloom.jpg"
+    },
+    {
+        "name": "Dầu Dưỡng Tóc Rose Oil Botanical Tinh Dầu Hoa Hồng Phục Hồi Tóc Chuyên Sâu Nhật Bản 60ml",
+        "category_name": "Chăm sóc tóc và da đầu",
+        "description": "Dầu dưỡng tóc Rose Oil Botanical là sản phẩm chăm sóc tóc cao cấp, chứa tinh dầu hoa hồng giúp phục hồi và nuôi dưỡng tóc hư tổn, mang lại sự mềm mượt và bóng khỏe.",
+        "price": 302000,
+        "stock_quantity": 100,
+        "image_file": "oil-rose.jpg",
+        "source_image": "images/oil-rose.jpg"
+    },
+    {
+        "name": "[d'Alba Official] Màu Posh Rose Son bóng làm đầy môi Plumping Lip Glow Volumizer 5ml",
+        "category_name": "Chăm sóc cơ thể",
+        "description": "Sản phẩm mới của Alba: Plumping Lip Glow Volumizer có 4 sắc thái: 1. Feeble Pink - Hồng nhạt nhẹ nhàng ,2. Posh Rose - Tông màu cam san hô thanh lịch, 3. Petal Rose - Màu cánh hoa hồng nhẹ nhàng ,4. Ruby Rose - Bóng đỏ quyến rũ và quyến rũ.",
+        "price": 230000,
+        "stock_quantity": 100,
+        "image_file": "son-bong-alba.jpg",
+        "source_image": "images/son-bong-alba.jpg"
+    },
+    {
+        "name": "Sữa Chống Nắng Sunplay Super Block SPF50+ PA++++ 30g/70g Chống Nắng Cho Hoạt Động Ngoài Trời",
+        "category_name": " Chăm sóc da mặt ",
+        "description": "Sữa Chống Nắng Sunplay Super Block SPF50+ PAt+++ Là dòng Chống Năng Phố Rộng Với Khả Năng Bảo Vệ Da Vượt trội Trước Tác Hại Của Tia UVA Và UVB. Công Thức Chống Nắng Cực Mạnh, Kháng Nước Và Mồ Hôi Hiệu Quả, Phù Hợp Cho Các Hoạt Động Ngoài Trời, Đi Biển, Bơi Lội, Du Lịch Và Chơi Thế Thao.",
+        "price": 70000,
+        "stock_quantity": 100,
+        "image_file": "kcn-sunplay.jpg",
+        "source_image": "images/kcn-sunplay.jpg"
+    },
+    {
+        "name": "Dior Maximizer Son Dưỡng Môi Nhiều Màu 206 Dưỡng Ẩm, Làm Mịn Môi, Căng Mọng",
+        "category_name": " Chăm sóc da mặt ",
+        "description": "Dior Addict là dòng son môi mang đến hiệu ứng căng bóng, mọng môi và giàu sức sống. Chất son mềm mượt, dễ tán, tạo lớp màu trong trẻo cùng độ bóng đẹp mắt, phù hợp sử dụng hằng ngày.",
+        "price": 420000,
+        "stock_quantity": 100,
+        "image_file": "son-duong-dior-206.jpg",
+        "source_image": "images/son-duong-dior-206.jpg"
+    },
+    {
+        "name": "Son Dưỡng Đu Đủ Lucas Papaw Úc 115 Năm - Dưỡng Môi Mềm Mịn, Giảm Khô Nứt Môi & Gót Tay Chân",
+        "category_name": " Chăm sóc da mặt",
+        "description": "[Lucas Papaw] Kem Dưỡng Đu Đủ Lucas Papaw Ointment Chiết Xuất Đu Đủ Tươi Từ Úc Giúp Dưỡng Môi Giảm Khô Nứt Da. Dung tích : 15g / 25g / 75g",
+        "price": 136000,
+        "stock_quantity": 100,
+        "image_file": "son-duong-lucas.jpg",
+        "source_image": "images/son-duong-lucas.jpg"
+    },
+    {
+        "name": "Sữa tắm Dove Serum Dưỡng Da Nâng Cao 300 ml",
+        "category_name": "Chăm sóc cơ thể",
+        "description": "Sữa tắm Dove Serum Dưỡng thế sáng da Glow Recharge, với 3% dưỡng chất serum sáng da chứa vitamin C, giúp tăng cường hiệu quả sáng da rạng rỡ ngay từ bước tắm.",
+        "price": 156000,
+        "stock_quantity": 100,
+        "image_file": "sua-tam-dove.jpg",
+        "source_image": "images/sua-tam-dove.jpg"
+    },
+    {
+        "name": "Xịt thơm body mist hương nước hoa Lush Bloom 250ml lưu hương lâu, an toàn cho da nhạy cảm",
+        "category_name": "Nước hoa",
+        "description": "Bodymist Hella Beauty là dòng xịt thơm đa năng dùng cho cơ thể, quần áo mang đến mùi hương nhẹ nhàng, dễ chịu, sạch sẽ nhưng vẫn đủ cuốn hút . Hương Lush Bloom: Hoa mẫu đơn & hạnh nhân - tươi mát, quý phái",
+        "price": 189000,
+        "stock_quantity": 60,
+        "image_file": "nuoc-hoa-lush-bloom.jpg",
+        "source_image": "images/nuoc-hoa-lush-bloom.jpg"
+    },  
+    {
+        "name": "Nước Hoa Nữ Flora Hồng Xanh Gucci Vial Lưu Hương 6-8 Giờ, Hương Hoa Ngọt Ngào, Dung Tích 10ml 20ml 30ml",
+        "category_name": "Nước hoa",
+        "description": "Lưu hương lâu dài - Tự tin suốt ngày dài! Nước hoa nữ Flora Hồng Xanh mang đến hương thơm ngọt ngào, gợi cảm và mãnh liệt, lưu hương bền bỉ từ 6 đến 8 giờ. Hương hoa kết hợp giữa Gardenia và Jasmine tạo nên sự cuốn hút khó cưỡng, phù hợp với mọi phong cách nữ tính.",
+        "price": 202000,
+        "stock_quantity": 60,
+        "image_file": "nuoc-hoa-flora.jpg",
+        "source_image": "images/nuoc-hoa-flora.jpg"
+    }
+]

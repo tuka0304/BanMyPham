@@ -1,0 +1,155 @@
+{% extends 'admin/layout.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h2 style="margin-bottom: 5px;"><i class="fa fa-boxes"></i> Quản lý Gói Combo Sản Phẩm</h2>
+        <p style="color: #9ca3af; font-size: 0.9rem; margin: 0;">Kết hợp nhiều mặt hàng thành gói bán kèm ưu đãi giá để kích thích đơn hàng và tăng giá trị giỏ hàng (AOV).</p>
+    </div>
+    <div style="display: flex; gap: 10px; align-items: center;">
+        <form method="get" action="{% url 'quan_ly_combo' %}" style="display: flex; gap: 8px; margin: 0;">
+            <input type="text" name="q" value="{{ tu_khoa }}" placeholder="Tìm tên combo, mô tả..." style="width: 250px; margin-bottom: 0;">
+            <button type="submit" class="btn btn-primary" style="padding: 10px 16px;">
+                <i class="fa fa-search"></i>
+            </button>
+            {% if tu_khoa %}
+            <a href="{% url 'quan_ly_combo' %}" class="btn btn-warning" style="padding: 10px 14px; color: #fff;">
+                <i class="fa fa-times"></i>
+            </a>
+            {% endif %}
+        </form>
+        <a href="{% url 'tao_combo' %}" class="btn btn-success" style="padding: 11px 20px; font-weight: 600;">
+            <i class="fa fa-plus"></i> Tạo Combo Mới
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-stats" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 30px;">
+    <div class="stat-card">
+        <div class="stat-icon bg-pink">
+            <i class="fa fa-boxes"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ tong_so_combo }}</h3>
+            <p>Tổng số Combo</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fa fa-check-circle"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ so_combo_hoat_dong }}</h3>
+            <p>Đang Mở Bán</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fa fa-chart-line"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Gợi ý AI</h3>
+            <p><a href="{% url 'admin_mba' %}" style="color: #60a5fa; text-decoration: none;">Xem phân tích giỏ hàng &rarr;</a></p>
+        </div>
+    </div>
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table>
+        <thead>
+            <tr>
+                <th style="padding-left: 20px; width: 60px;">ID</th>
+                <th style="width: 80px;">Hình ảnh</th>
+                <th>Thông tin Combo</th>
+                <th style="width: 32%;">Mặt hàng thành phần</th>
+                <th>Giá Gốc & Giá Bán</th>
+                <th style="text-align: center; width: 120px;">Trạng thái</th>
+                <th style="text-align: center; width: 140px; padding-right: 20px;">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for combo in danh_sach_combo %}
+            <tr>
+                <td style="padding-left: 20px; color: #9ca3af; font-weight: 600;">#{{ combo.id }}</td>
+                <td>
+                    <img src="{{ combo.lay_hinh_anh }}?v=2" alt="{{ combo.ten_combo }}" style="width: 58px; height: 58px; object-fit: cover; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
+                </td>
+                <td>
+                    <div style="font-weight: 700; color: #fff; font-size: 1.05rem; margin-bottom: 4px;">{{ combo.ten_combo }}</div>
+                    {% if combo.mo_ta %}
+                    <div style="color: #9ca3af; font-size: 0.83rem; line-height: 1.3; max-width: 260px;">{{ combo.mo_ta|truncatechars:80 }}</div>
+                    {% endif %}
+                    <small style="color: #6b7280; font-size: 0.75rem;">Tạo ngày: {{ combo.ngay_tao|date:"d/m/Y H:i" }}</small>
+                </td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        {% for chi_tiet in combo.danh_sach_san_pham.all %}
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(0,0,0,0.25); padding: 5px 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.04);">
+                            <img src="{{ chi_tiet.san_pham.image_url|default:'/static/images/no-image.png' }}?v=2" style="width: 28px; height: 28px; object-fit: cover; border-radius: 5px; flex-shrink: 0;">
+                            <div style="flex: 1; font-size: 0.82rem; color: #e5e7eb; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                <strong>{{ chi_tiet.san_pham.name }}</strong>
+                            </div>
+                            <span style="background: rgba(236,72,153,0.15); color: #ec4899; padding: 1px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 700;">
+                                x{{ chi_tiet.so_luong }}
+                            </span>
+                            <span style="color: #9ca3af; font-size: 0.75rem;">
+                                {{ chi_tiet.san_pham.price|currency }}
+                            </span>
+                        </div>
+                        {% empty %}
+                        <span style="color: #ef4444; font-size: 0.8rem;">Chưa có sản phẩm</span>
+                        {% endfor %}
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 3px;">
+                        <span style="color: #ec4899; font-weight: 800; font-size: 1.1rem;">{{ combo.gia_combo|currency }}</span>
+                        {% if combo.gia_goc > combo.gia_combo %}
+                        <div style="display: flex; align-items: center; gap: 6px;">
+                            <del style="color: #6b7280; font-size: 0.85rem;">{{ combo.gia_goc|currency }}</del>
+                            <span style="background: rgba(16,185,129,0.15); color: #34d399; font-weight: 700; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16,185,129,0.3);">
+                                -{{ combo.tinh_phan_tram_tiet_kiem }}%
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td style="text-align: center;">
+                    <a href="{% url 'doi_trang_thai_combo' combo.id %}" style="text-decoration: none;">
+                        {% if combo.trang_thai %}
+                        <span style="background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                            <i class="fa fa-check-circle"></i> Đang bán
+                        </span>
+                        {% else %}
+                        <span style="background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px;">
+                            <i class="fa fa-pause-circle"></i> Tạm ẩn
+                        </span>
+                        {% endif %}
+                    </a>
+                </td>
+                <td style="text-align: center; padding-right: 20px;">
+                    <div style="display: flex; justify-content: center; gap: 6px;">
+                        <a href="{% url 'sua_combo' combo.id %}" class="btn btn-warning" title="Sửa combo" style="padding: 6px 12px; font-size: 0.85rem;">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a href="{% url 'xoa_combo' combo.id %}" class="btn btn-danger" title="Xóa combo" style="padding: 6px 12px; font-size: 0.85rem;" onclick="return confirm('Bạn có chắc muốn xóa gói combo \'{{ combo.ten_combo }}\'?');">
+                            <i class="fa fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 50px 20px; color: #9ca3af;">
+                    <div style="font-size: 3rem; color: #374151; margin-bottom: 12px;"><i class="fa fa-box-open"></i></div>
+                    <h3 style="color: #fff; margin-bottom: 8px;">Chưa có gói Combo nào</h3>
+                    <p style="margin-bottom: 20px; font-size: 0.9rem;">Hãy tạo gói combo đầu tiên kết hợp các sản phẩm bán chạy hoặc các gợi ý từ Market Basket để thúc đẩy doanh thu!</p>
+                    <a href="{% url 'tao_combo' %}" class="btn btn-primary"><i class="fa fa-plus"></i> Tạo Combo Mới Ngay</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

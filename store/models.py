@@ -186,3 +186,48 @@ class ChiTietPhieuKho(models.Model):
     def tinh_thanh_tien(self):
         return self.so_luong * self.don_gia
 
+
+class ComboSanPham(models.Model):
+    ten_combo = models.CharField(max_length=255)
+    mo_ta = models.TextField(blank=True, null=True)
+    gia_combo = models.FloatField()
+    gia_goc = models.FloatField(default=0.0)
+    hinh_anh = models.CharField(max_length=500, blank=True, null=True)
+    trang_thai = models.BooleanField(default=True)
+    ngay_tao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'combo_san_pham'
+
+    def __str__(self):
+        return self.ten_combo
+
+    def tinh_tong_gia_goc(self):
+        return sum(chi_tiet.san_pham.price * chi_tiet.so_luong for chi_tiet in self.danh_sach_san_pham.all())
+
+    def tinh_phan_tram_tiet_kiem(self):
+        tong_goc = self.gia_goc or self.tinh_tong_gia_goc()
+        if tong_goc > self.gia_combo and tong_goc > 0:
+            return round((tong_goc - self.gia_combo) / tong_goc * 100)
+        return 0
+
+    def lay_hinh_anh(self):
+        if self.hinh_anh:
+            return self.hinh_anh
+        dau_tien = self.danh_sach_san_pham.select_related('san_pham').first()
+        if dau_tien and dau_tien.san_pham.image_url:
+            return dau_tien.san_pham.image_url
+        return '/static/images/no-image.png'
+
+
+class ChiTietCombo(models.Model):
+    combo = models.ForeignKey(ComboSanPham, on_delete=models.CASCADE, related_name='danh_sach_san_pham')
+    san_pham = models.ForeignKey(Product, on_delete=models.CASCADE)
+    so_luong = models.IntegerField(default=1)
+
+    class Meta:
+        db_table = 'chi_tiet_combo'
+
+    def tinh_thanh_tien(self):
+        return self.san_pham.price * self.so_luong
+

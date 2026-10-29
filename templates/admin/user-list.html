@@ -2,121 +2,139 @@
 {% load static %}
 
 {% block content %}
-<style>
-    .admin-card { background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); padding: 30px; margin-bottom: 20px; }
-    .form-group { margin-bottom: 15px; }
-    .form-control { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-</style>
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px;">
+    <div>
+        <h2 style="margin: 0 0 5px 0;"><i class="fa fa-users-cog"></i> Quản lý Người Dùng & Phân Quyền</h2>
+        <p style="color: #9ca3af; font-size: 0.9rem; margin: 0;">Quản lý vai trò (Role-Based Access Control), trạng thái tài khoản và cấp quyền nhân viên.</p>
+    </div>
+    <button type="button" onclick="var f=document.getElementById('khung_them_nhan_vien'); f.style.display=(f.style.display==='none'?'block':'none');" class="btn btn-primary" style="padding: 11px 20px; font-weight: 600;">
+        <i class="fa fa-user-plus"></i> Tạo Tài Khoản Nhân Viên
+    </button>
+</div>
 
-<div class="admin-card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+<div id="khung_them_nhan_vien" style="display: none; background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(236, 72, 153, 0.3); border-radius: 16px; padding: 25px; margin-bottom: 25px;">
+    <h3 style="color: #fff; margin: 0 0 15px 0; font-size: 1.15rem; display: flex; align-items: center; gap: 10px;">
+        <i class="fa fa-id-badge" style="color: #ec4899;"></i> Khởi Tạo Tài Khoản Nhân Viên Mới
+    </h3>
+    <form action="{% url 'admin_create_employee' %}" method="post" style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; align-items: end;">
+        {% csrf_token %}
         <div>
-            <h2 style="color: #333; margin: 0; display: flex; align-items: center; gap: 12px;">
-                <i class="fas fa-users-cog" style="color: #e91e63;"></i> Quản lý người dùng
-            </h2>
-            <p style="color: #888; margin: 5px 0 0 0;">Quản lý quyền truy cập và trạng thái hoạt động của thành viên.</p>
+            <label style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 6px; display: block;">Tên đăng nhập (Username) *</label>
+            <input type="text" name="username" required placeholder="Ví dụ: nhanvien_kho" style="margin-bottom: 0;">
         </div>
-        <button onclick="document.getElementById('addEmployeeForm').style.display='block'" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i> Tạo Nhân Viên
-        </button>
-    </div>
+        <div>
+            <label style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 6px; display: block;">Mật khẩu *</label>
+            <input type="password" name="password" required placeholder="Nhập mật khẩu an toàn" style="margin-bottom: 0;">
+        </div>
+        <div>
+            <label style="color: #9ca3af; font-size: 0.85rem; margin-bottom: 6px; display: block;">Email *</label>
+            <input type="email" name="email" required placeholder="email@aeterna.com" style="margin-bottom: 0;">
+        </div>
+        <div>
+            <button type="submit" class="btn btn-success" style="padding: 12px 22px; font-weight: 600; white-space: nowrap;">
+                <i class="fa fa-check"></i> Lưu Nhân Viên
+            </button>
+        </div>
+    </form>
+</div>
 
-    <div id="addEmployeeForm" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-        <h4 style="margin-top: 0;">Tạo tài khoản Nhân viên mới</h4>
-        <form action="{% url 'admin_create_employee' %}" method="post" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            {% csrf_token %}
-            <div class="form-group">
-                <label>Tên đăng nhập</label>
-                <input type="text" name="username" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Mật khẩu</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" name="email" class="form-control" required>
-            </div>
-            <div class="form-group" style="display: flex; align-items: flex-end;">
-                <button type="submit" class="btn btn-success" style="width: 100%; padding: 10px;">Lưu Nhân Viên</button>
-            </div>
-        </form>
-    </div>
-
-    <table style="width: 100%; border-collapse: collapse;">
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table>
         <thead>
-            <tr style="text-align: left; border-bottom: 2px solid #f8f9fa; color: #999; font-size: 13px;">
-                <th style="padding: 15px;">THÔNG TIN USER</th>
-                <th style="padding: 15px;">EMAIL</th>
-                <th style="padding: 15px; text-align: center;">VAI TRÒ</th>
-                <th style="padding: 15px; text-align: center;">TRẠNG THÁI</th>
-                <th style="padding: 15px; text-align: right;">HÀNH ĐỘNG</th>
+            <tr>
+                <th style="padding-left: 20px; width: 25%;">THÔNG TIN USER</th>
+                <th style="width: 25%;">EMAIL</th>
+                <th style="text-align: center; width: 18%;">VAI TRÒ (ROLE)</th>
+                <th style="text-align: center; width: 16%;">TRẠNG THÁI</th>
+                <th style="text-align: center; width: 16%; padding-right: 20px;">HÀNH ĐỘNG</th>
             </tr>
         </thead>
         <tbody>
             {% for u in users %}
-            <tr style="border-bottom: 1px solid #fbfbfb;">
-                <td style="padding: 15px;">
-                    <div style="font-weight: 600; color: #333;">{{ u.username }}</div>
-                    <small style="color: #aaa;">ID: #{{ u.id }}</small>
+            <tr>
+                <td style="padding-left: 20px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 10px; background: linear-gradient(135deg, rgba(236,72,153,0.2), rgba(139,92,246,0.2)); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; color: #ec4899; font-weight: 700; font-size: 1.1rem; flex-shrink: 0;">
+                            {{ u.username|slice:":1"|upper }}
+                        </div>
+                        <div>
+                            <div style="font-weight: 700; color: #fff; font-size: 0.95rem;">{{ u.username }}</div>
+                            <small style="color: #9ca3af; font-size: 0.78rem;">Mã ID: #{{ u.id }}</small>
+                        </div>
+                    </div>
                 </td>
-                <td style="padding: 15px; color: #666;">{{ u.email }}</td>
                 
-                <td style="padding: 15px; text-align: center;">
+                <td style="color: #d1d5db; font-size: 0.9rem;">
+                    {{ u.email|default:'Chưa cập nhật' }}
+                </td>
+                
+                <td style="text-align: center;">
                     {% if u.id == request.user.id %}
-                        <span style="padding: 5px 10px; border-radius: 6px; background: #eee; font-size: 13px;">{{ u.role }}</span>
+                        <span style="background: linear-gradient(135deg, rgba(236,72,153,0.2), rgba(139,92,246,0.2)); color: #ec4899; border: 1px solid rgba(236,72,153,0.4); padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; display: inline-block;">
+                            <i class="fa fa-crown" style="margin-right: 4px;"></i> ADMIN (Bạn)
+                        </span>
                     {% else %}
-                        <form action="{% url 'admin_update_user_role' %}" method="post">
+                        <form action="{% url 'admin_update_user_role' %}" method="post" style="margin: 0; display: inline-block;">
                             {% csrf_token %}
                             <input type="hidden" name="userId" value="{{ u.id }}">
                             <select name="role" onchange="this.form.submit()" 
-                                    style="padding: 5px 10px; border-radius: 6px; border: 1px solid #ddd; font-size: 13px; cursor: pointer;">
-                                <option value="CUSTOMER" {% if u.role == 'CUSTOMER' %}selected{% endif %}>Khách hàng</option>
-                                <option value="EMPLOYEE" {% if u.role == 'EMPLOYEE' %}selected{% endif %}>Nhân viên</option>
-                                <option value="ADMIN" {% if u.role == 'ADMIN' %}selected{% endif %}>Quản trị viên</option>
+                                    style="margin: 0; width: auto; background: rgba(0, 0, 0, 0.5); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                                <option value="CUSTOMER" {% if u.role == 'CUSTOMER' %}selected{% endif %} style="background: #111827; color: #fff;">Khách hàng</option>
+                                <option value="EMPLOYEE" {% if u.role == 'EMPLOYEE' %}selected{% endif %} style="background: #111827; color: #60a5fa;">Nhân viên</option>
+                                <option value="ADMIN" {% if u.role == 'ADMIN' %}selected{% endif %} style="background: #111827; color: #ec4899;">Quản trị viên</option>
                             </select>
                         </form>
                     {% endif %}
                 </td>
 
-                <td style="padding: 15px; text-align: center;">
+                <td style="text-align: center;">
                     {% if u.is_active %}
-                    <span style="color: #38a169; background: #f0fff4; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                        Đang hoạt động
+                    <span style="color: #34d399; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="fa fa-check-circle"></i> Đang hoạt động
                     </span>
                     {% else %}
-                    <span style="color: #e53e3e; background: #fff5f5; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">
-                        Đang bị khóa
+                    <span style="color: #f87171; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); padding: 5px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 700; display: inline-flex; align-items: center; gap: 5px;">
+                        <i class="fa fa-lock"></i> Đang bị khóa
                     </span>
                     {% endif %}
                 </td>
 
-                <td style="padding: 15px; text-align: right;">
+                <td style="text-align: center; padding-right: 20px;">
                     {% if u.id != request.user.id %}
-                        <form action="{% url 'admin_toggle_user_status' %}" method="post" style="display: inline-block;">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 8px;">
+                        <form action="{% url 'admin_toggle_user_status' %}" method="post" style="margin: 0; display: inline-block;">
                             {% csrf_token %}
                             <input type="hidden" name="userId" value="{{ u.id }}">
                             {% if u.is_active %}
-                            <button type="submit" 
-                                    style="background: #2d3436; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px;">
-                                <i class="fas fa-user-slash"></i>
-                                <span>Khóa</span>
+                            <button type="submit" class="btn" 
+                                    style="background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">
+                                <i class="fa fa-user-slash"></i> Khóa
                             </button>
                             {% else %}
-                            <button type="submit" 
-                                    style="background: #e91e63; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px;">
-                                <i class="fas fa-user-check"></i>
-                                <span>Mở khóa</span>
+                            <button type="submit" class="btn" 
+                                    style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600;">
+                                <i class="fa fa-user-check"></i> Mở khóa
                             </button>
                             {% endif %}
                         </form>
                         
                         <a href="{% url 'admin_delete_user' u.id %}" 
-                           onclick="return confirm('Bạn có chắc chắn muốn xóa người dùng này?')"
-                           style="margin-left: 8px; color: #888; text-decoration: none; font-size: 14px;">
-                            <i class="fas fa-trash"></i>
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản \'{{ u.username }}\'?')"
+                           class="btn"
+                           style="background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 10px; border-radius: 8px; font-size: 0.8rem;"
+                           title="Xóa tài khoản">
+                            <i class="fa fa-trash"></i>
                         </a>
+                    </div>
+                    {% else %}
+                        <span style="color: #6b7280; font-size: 0.8rem; font-style: italic;">Không áp dụng</span>
                     {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: #9ca3af;">
+                    Chưa có tài khoản người dùng nào.
                 </td>
             </tr>
             {% endfor %}

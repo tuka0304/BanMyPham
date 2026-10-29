@@ -118,10 +118,13 @@
                             </div>
                         </div>
                     </div>
-                    <div style="text-align: right; margin-left: 10px;">
+                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-left: 10px;">
                         <span style="background: rgba(16,185,129,0.15); color: #34d399; font-weight: 700; font-size: 0.82rem; padding: 4px 10px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3); display: inline-block;">
                             Lift: {{ rule.lift }}x
                         </span>
+                        <a href="{% url 'tao_combo' %}?sp_ids={{ rule.antecedent.id }},{{ rule.consequent.id }}&ten=Combo%20{{ rule.antecedent.name|truncatechars:15 }}%20+%20{{ rule.consequent.name|truncatechars:15 }}" class="btn btn-primary" style="padding: 4px 10px; font-size: 0.78rem; border-radius: 6px;">
+                            <i class="fa fa-boxes"></i> Tạo Combo
+                        </a>
                     </div>
                 </div>
                 {% empty %}
@@ -148,7 +151,8 @@
                         <span style="color: #ec4899; font-weight: 700; font-size: 0.85rem;">{{ pair.count }} quy tắc</span>
                     </div>
                     <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden;">
-                        <div style="height: 100%; background: linear-gradient(90deg, #ec4899, #8b5cf6); width: {% widthratio pair.count 20 100 %}%;"></div>
+                        {% widthratio pair.count 20 100 as ty_le_chieu_rong %}
+                        <div class="thanh_tien_do_danh_muc" style="height: 100%; background: linear-gradient(90deg, #ec4899, #8b5cf6);" data-chieu-rong="{{ ty_le_chieu_rong }}"></div>
                     </div>
                 </div>
                 {% empty %}
@@ -258,7 +262,12 @@
 
                         <!-- Strategy Description -->
                         <td style="color: #9ca3af; font-size: 0.82rem; line-height: 1.4;">
-                            {{ rule.strategy_desc }}
+                            <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                <span>{{ rule.strategy_desc }}</span>
+                                <a href="{% url 'tao_combo' %}?sp_ids={{ rule.antecedent.id }},{{ rule.consequent.id }}&ten=Combo%20{{ rule.antecedent.name|truncatechars:15 }}%20+%20{{ rule.consequent.name|truncatechars:15 }}" class="btn btn-primary" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; white-space: nowrap;">
+                                    <i class="fa fa-boxes"></i> Tạo Combo
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
@@ -273,4 +282,14 @@
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.thanh_tien_do_danh_muc').forEach(function(phan_tu) {
+        var ty_le = phan_tu.getAttribute('data-chieu-rong');
+        if (ty_le) {
+            phan_tu.style.width = ty_le + '%';
+        }
+    });
+});
+</script>
 {% endblock %}

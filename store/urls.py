@@ -71,4 +71,9 @@ urlpatterns = [
     path('kho/nha-cung-cap/', views.quan_ly_nha_cung_cap, name='quan_ly_nha_cung_cap'),
     path('kho/nha-cung-cap/them/', views.them_nha_cung_cap, name='them_nha_cung_cap'),
     path('kho/nha-cung-cap/xoa/<int:ma_id>/', views.xoa_nha_cung_cap, name='xoa_nha_cung_cap'),
+    path('admin_dashboard/combos/', views.quan_ly_combo, name='quan_ly_combo'),
+    path('admin_dashboard/combos/tao/', views.tao_combo, name='tao_combo'),
+    path('admin_dashboard/combos/sua/<int:ma_id>/', views.sua_combo, name='sua_combo'),
+    path('admin_dashboard/combos/xoa/<int:ma_id>/', views.xoa_combo, name='xoa_combo'),
+    path('admin_dashboard/combos/doi-trang-thai/<int:ma_id>/', views.doi_trang_thai_combo, name='doi_trang_thai_combo'),
 ]

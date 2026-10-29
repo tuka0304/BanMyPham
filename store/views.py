@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.files.storage import FileSystemStorage
-from .models import User, Category, Product, Cart, CartItem, Order, OrderItem, PriceAdjustmentRequest, ChiNhanh, NhaCungCap, PhieuKho, ChiTietPhieuKho
+from .models import User, Category, Product, Cart, CartItem, Order, OrderItem, PriceAdjustmentRequest, ChiNhanh, NhaCungCap, PhieuKho, ChiTietPhieuKho, ComboSanPham, ChiTietCombo
 from django.db.models import Sum, Q
 from django.utils import timezone
 from django.core.paginator import Paginator
@@ -217,20 +217,32 @@ def staff_required(view_func):
 
 @admin_required
 def admin_index(request):
-    delivered_orders = Order.objects.filter(status='DELIVERED')
-    revenue = sum(o.total_amount for o in delivered_orders)
+    don_hang_da_giao = Order.objects.filter(status='DELIVERED')
+    tong_doanh_thu = sum(o.total_amount for o in don_hang_da_giao)
     
-    current_month = timezone.now().month
-    current_year = timezone.now().year
-    monthly_orders = delivered_orders.filter(order_date__month=current_month, order_date__year=current_year)
-    monthly_revenue = sum(o.total_amount for o in monthly_orders)
+    thoi_gian_hien_tai = timezone.now()
+    don_hang_thang_nay = don_hang_da_giao.filter(
+        order_date__month=thoi_gian_hien_tai.month,
+        order_date__year=thoi_gian_hien_tai.year
+    )
+    doanh_thu_thang_nay = sum(o.total_amount for o in don_hang_thang_nay)
+
+    don_hang_moi_nhat = Order.objects.all().select_related('user').order_by('-order_date')[:8]
+    san_pham_sap_het_kho = Product.objects.all().select_related('category').filter(stock_quantity__lte=15).order_by('stock_quantity')[:8]
+    thanh_vien_moi = User.objects.all().order_by('-date_joined')[:6]
+    combo_noi_bat = ComboSanPham.objects.all().prefetch_related('danh_sach_san_pham__san_pham').order_by('-ngay_tao')[:5]
     
     return render(request, 'admin/index.html', {
+        'activePage': 'dashboard',
         'productCount': Product.objects.count(),
         'userCount': User.objects.count(),
         'orderCount': Order.objects.count(),
-        'revenue': revenue,
-        'monthly_revenue': monthly_revenue
+        'revenue': tong_doanh_thu,
+        'monthly_revenue': doanh_thu_thang_nay,
+        'don_hang_moi_nhat': don_hang_moi_nhat,
+        'san_pham_sap_het_kho': san_pham_sap_het_kho,
+        'thanh_vien_moi': thanh_vien_moi,
+        'combo_noi_bat': combo_noi_bat,
     })
 
 @admin_required
@@ -812,5 +824,212 @@ def xoa_nha_cung_cap(yeu_cau, ma_id):
     nha_cung_cap.delete()
     messages.success(yeu_cau, f"Đã xóa nhà cung cấp '{ten}'!")
     return redirect('quan_ly_nha_cung_cap')
+
+
+@admin_required
+def quan_ly_combo(yeu_cau):
+    tu_khoa = yeu_cau.GET.get('q', '').strip()
+    danh_sach_combo = ComboSanPham.objects.all().prefetch_related('danh_sach_san_pham__san_pham').order_by('-ngay_tao')
+
+    if tu_khoa:
+        danh_sach_combo = danh_sach_combo.filter(
+            Q(ten_combo__icontains=tu_khoa) |
+            Q(mo_ta__icontains=tu_khoa)
+        )
+
+    tong_so_combo = danh_sach_combo.count()
+    so_combo_hoat_dong = danh_sach_combo.filter(trang_thai=True).count()
+
+    return render(yeu_cau, 'admin/quan_ly_combo.html', {
+        'activePage': 'combo_management',
+        'danh_sach_combo': danh_sach_combo,
+        'tu_khoa': tu_khoa,
+        'tong_so_combo': tong_so_combo,
+        'so_combo_hoat_dong': so_combo_hoat_dong,
+    })
+
+
+@admin_required
+def tao_combo(yeu_cau):
+    if yeu_cau.method == 'POST':
+        ten_combo = yeu_cau.POST.get('ten_combo', '').strip()
+        mo_ta = yeu_cau.POST.get('mo_ta', '').strip()
+        gia_combo_chuoi = yeu_cau.POST.get('gia_combo', '0').strip()
+        hinh_anh = yeu_cau.POST.get('hinh_anh', '').strip()
+        danh_sach_id_san_pham = yeu_cau.POST.getlist('san_pham_id[]')
+        danh_sach_so_luong = yeu_cau.POST.getlist('so_luong[]')
+
+        if not ten_combo:
+            messages.error(yeu_cau, "Vui lòng nhập tên combo.")
+            return redirect('tao_combo')
+
+        try:
+            gia_combo = float(gia_combo_chuoi)
+            if gia_combo <= 0:
+                raise ValueError
+        except ValueError:
+            messages.error(yeu_cau, "Giá combo phải là số dương hợp lệ.")
+            return redirect('tao_combo')
+
+        if len(danh_sach_id_san_pham) < 2:
+            messages.error(yeu_cau, "Gói combo cần kết hợp ít nhất 2 mặt hàng sản phẩm.")
+            return redirect('tao_combo')
+
+        tong_gia_goc = 0.0
+        chi_tiet_hop_le = []
+
+        for vi_tri in range(len(danh_sach_id_san_pham)):
+            ma_san_pham = danh_sach_id_san_pham[vi_tri]
+            try:
+                so_luong = int(danh_sach_so_luong[vi_tri])
+                if so_luong <= 0:
+                    so_luong = 1
+            except (ValueError, IndexError):
+                so_luong = 1
+
+            san_pham = Product.objects.filter(id=ma_san_pham).first()
+            if san_pham:
+                tong_gia_goc += san_pham.price * so_luong
+                chi_tiet_hop_le.append((san_pham, so_luong))
+
+        if len(chi_tiet_hop_le) < 2:
+            messages.error(yeu_cau, "Cần chọn ít nhất 2 sản phẩm hợp lệ để tạo combo.")
+            return redirect('tao_combo')
+
+        combo_moi = ComboSanPham.objects.create(
+            ten_combo=ten_combo,
+            mo_ta=mo_ta,
+            gia_combo=gia_combo,
+            gia_goc=tong_gia_goc,
+            hinh_anh=hinh_anh if hinh_anh else None,
+            trang_thai=True
+        )
+
+        for san_pham, so_luong in chi_tiet_hop_le:
+            ChiTietCombo.objects.create(
+                combo=combo_moi,
+                san_pham=san_pham,
+                so_luong=so_luong
+            )
+
+        messages.success(yeu_cau, f"Đã tạo combo '{ten_combo}' thành công!")
+        return redirect('quan_ly_combo')
+
+    danh_sach_san_pham = Product.objects.all().select_related('category').order_by('name')
+    danh_sach_id_chon_truoc = []
+    tham_so_sp_ids = yeu_cau.GET.get('sp_ids', '')
+    if tham_so_sp_ids:
+        danh_sach_id_chon_truoc = [int(ma_so) for ma_so in tham_so_sp_ids.split(',') if ma_so.strip().isdigit()]
+
+    ten_combo_goi_y = yeu_cau.GET.get('ten', '')
+
+    return render(yeu_cau, 'admin/form_combo.html', {
+        'activePage': 'combo_management',
+        'danh_sach_san_pham': danh_sach_san_pham,
+        'danh_sach_id_chon_truoc': danh_sach_id_chon_truoc,
+        'ten_combo_goi_y': ten_combo_goi_y,
+        'la_chinh_sua': False,
+    })
+
+
+@admin_required
+def sua_combo(yeu_cau, ma_id):
+    combo = get_object_or_404(ComboSanPham, id=ma_id)
+
+    if yeu_cau.method == 'POST':
+        ten_combo = yeu_cau.POST.get('ten_combo', '').strip()
+        mo_ta = yeu_cau.POST.get('mo_ta', '').strip()
+        gia_combo_chuoi = yeu_cau.POST.get('gia_combo', '0').strip()
+        hinh_anh = yeu_cau.POST.get('hinh_anh', '').strip()
+        danh_sach_id_san_pham = yeu_cau.POST.getlist('san_pham_id[]')
+        danh_sach_so_luong = yeu_cau.POST.getlist('so_luong[]')
+
+        if not ten_combo:
+            messages.error(yeu_cau, "Vui lòng nhập tên combo.")
+            return redirect('sua_combo', ma_id=ma_id)
+
+        try:
+            gia_combo = float(gia_combo_chuoi)
+            if gia_combo <= 0:
+                raise ValueError
+        except ValueError:
+            messages.error(yeu_cau, "Giá combo phải là số dương hợp lệ.")
+            return redirect('sua_combo', ma_id=ma_id)
+
+        if len(danh_sach_id_san_pham) < 2:
+            messages.error(yeu_cau, "Gói combo cần kết hợp ít nhất 2 mặt hàng sản phẩm.")
+            return redirect('sua_combo', ma_id=ma_id)
+
+        tong_gia_goc = 0.0
+        chi_tiet_hop_le = []
+
+        for vi_tri in range(len(danh_sach_id_san_pham)):
+            ma_san_pham = danh_sach_id_san_pham[vi_tri]
+            try:
+                so_luong = int(danh_sach_so_luong[vi_tri])
+                if so_luong <= 0:
+                    so_luong = 1
+            except (ValueError, IndexError):
+                so_luong = 1
+
+            san_pham = Product.objects.filter(id=ma_san_pham).first()
+            if san_pham:
+                tong_gia_goc += san_pham.price * so_luong
+                chi_tiet_hop_le.append((san_pham, so_luong))
+
+        if len(chi_tiet_hop_le) < 2:
+            messages.error(yeu_cau, "Cần chọn ít nhất 2 sản phẩm hợp lệ để lưu combo.")
+            return redirect('sua_combo', ma_id=ma_id)
+
+        combo.ten_combo = ten_combo
+        combo.mo_ta = mo_ta
+        combo.gia_combo = gia_combo
+        combo.gia_goc = tong_gia_goc
+        combo.hinh_anh = hinh_anh if hinh_anh else None
+        combo.save()
+
+        combo.danh_sach_san_pham.all().delete()
+        for san_pham, so_luong in chi_tiet_hop_le:
+            ChiTietCombo.objects.create(
+                combo=combo,
+                san_pham=san_pham,
+                so_luong=so_luong
+            )
+
+        messages.success(yeu_cau, f"Đã cập nhật combo '{ten_combo}' thành công!")
+        return redirect('quan_ly_combo')
+
+    danh_sach_san_pham = Product.objects.all().select_related('category').order_by('name')
+    danh_sach_chi_tiet_hien_tai = combo.danh_sach_san_pham.select_related('san_pham').all()
+    danh_sach_id_chon_truoc = [chi_tiet.san_pham_id for chi_tiet in danh_sach_chi_tiet_hien_tai]
+    ban_do_so_luong = {chi_tiet.san_pham_id: chi_tiet.so_luong for chi_tiet in danh_sach_chi_tiet_hien_tai}
+
+    return render(yeu_cau, 'admin/form_combo.html', {
+        'activePage': 'combo_management',
+        'combo': combo,
+        'danh_sach_san_pham': danh_sach_san_pham,
+        'danh_sach_id_chon_truoc': danh_sach_id_chon_truoc,
+        'ban_do_so_luong': ban_do_so_luong,
+        'la_chinh_sua': True,
+    })
+
+
+@admin_required
+def xoa_combo(yeu_cau, ma_id):
+    combo = get_object_or_404(ComboSanPham, id=ma_id)
+    ten_combo = combo.ten_combo
+    combo.delete()
+    messages.success(yeu_cau, f"Đã xóa gói combo '{ten_combo}' thành công!")
+    return redirect('quan_ly_combo')
+
+
+@admin_required
+def doi_trang_thai_combo(yeu_cau, ma_id):
+    combo = get_object_or_404(ComboSanPham, id=ma_id)
+    combo.trang_thai = not combo.trang_thai
+    combo.save()
+    trang_thai_chuoi = "kích hoạt mở bán" if combo.trang_thai else "tạm ẩn"
+    messages.success(yeu_cau, f"Đã {trang_thai_chuoi} combo '{combo.ten_combo}'!")
+    return redirect('quan_ly_combo')
 
 
